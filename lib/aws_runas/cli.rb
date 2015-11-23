@@ -15,6 +15,7 @@
 require 'trollop'
 require 'aws_runas/config'
 require 'aws_runas/main'
+require 'io/console'
 
 module AwsRunAs
   module Cli

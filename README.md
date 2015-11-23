@@ -36,7 +36,7 @@ If COMMAND is omitted, the default shell (/bin/sh) will
 launch.
 
 [options] are:
-  -p, --path           Path to the AWS config file
+  -p, --path=<s>       Path to the AWS config file
   -r, --profile=<s>    The AWS profile to load (default: default)
   -h, --help           Show this message
 ```

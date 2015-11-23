@@ -22,8 +22,8 @@ module AwsRunAs
     module_function
 
     # loads the command-line options.
-    def load_opts
-      Trollop.options do
+    def load_opts(args: ARGV)
+      Trollop.options(args) do
         banner <<-EOS.gsub(/^ {10}/, '')
           aws-runas: Run commands under AWS IAM roles
 
@@ -36,8 +36,8 @@ module AwsRunAs
           [options] are:
         EOS
 
-        opt :path, 'Path to the AWS config file'
-        opt :profile, 'The AWS profile to load', default: 'default'
+        opt :path, 'Path to the AWS config file', type: String
+        opt :profile, 'The AWS profile to load', type: String, default: 'default'
         stop_on_unknown
       end
     end

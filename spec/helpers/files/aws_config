@@ -1,0 +1,8 @@
+[default]
+region = us-east-1
+
+[profile test-profile]
+role_arn = arn:aws:iam::123456789012:role/test-admin
+mfa_serial = arn:aws:iam::123456789012:mfa/test
+region = us-west-1
+source_profile = default

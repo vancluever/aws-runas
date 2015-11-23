@@ -14,8 +14,38 @@
 
 require 'spec_helper'
 require 'aws_runas/cli'
+require 'aws_runas/main'
 
 describe AwsRunAs::Cli do
+  describe '::load_opts' do
+    it 'loads the path option' do
+      opts = AwsRunAs::Cli.load_opts(args: ['--path', 'test-opts/aws_config'])
+      expect(opts[:path]).to eq('test-opts/aws_config')
+    end
+
+    it 'loads the profile option' do
+      opts = AwsRunAs::Cli.load_opts(args: ['--profile', 'test-profile'])
+      expect(opts[:profile]).to eq('test-profile')
+    end
+  end
+
+  describe '::start' do
+    before(:example) do
+      allow(AwsRunAs::Cli).to receive(:load_opts).and_return({})
+      allow(AwsRunAs::Cli).to receive(:read_mfa_if_needed)
+      allow(AwsRunAs::Main).to receive(:new).and_return double(
+        'AwsRunAs::Main',
+        assume_role: true,
+        handoff: true
+      )
+    end
+
+    it 'creates an AwsConfig::Main instance' do
+      expect(AwsRunAs::Main).to receive(:new)
+      AwsRunAs::Cli.start
+    end
+  end
+
   describe '::read_mfa_if_needed' do
     it 'reads the MFA code' do
       allow(STDIN).to receive(:gets).and_return('123456')

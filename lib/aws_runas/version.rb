@@ -13,5 +13,5 @@
 # limitations under the License.
 
 module AwsRunAs
-  VERSION = '0.1.0'
+  VERSION = '0.1.1'
 end

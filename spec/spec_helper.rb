@@ -16,6 +16,7 @@ require 'simplecov'
 require 'codecov'
 SimpleCov.start do
   add_filter '/vendor/'
+  add_filter '/spec/'
 end
 
 SimpleCov.formatter = SimpleCov::Formatter::Codecov if ENV['CI'] == 'true'

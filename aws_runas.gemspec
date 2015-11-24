@@ -32,6 +32,9 @@ Gem::Specification.new do |spec|
   spec.test_files = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = %w(lib)
 
+  spec.cert_chain  = ['certs/vancluever.pem']
+  spec.signing_key = File.expand_path('~/.ssh/gem-private_key.pem') if $PROGRAM_NAME =~ /gem\z/
+
   spec.add_dependency 'aws-sdk', '~> 2.2.1'
   spec.add_dependency 'inifile', '~> 3.0.0'
   spec.add_dependency 'trollop', '~> 2.1.2'

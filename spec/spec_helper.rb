@@ -13,9 +13,12 @@
 # limitations under the License.
 
 require 'simplecov'
+require 'codecov'
 SimpleCov.start do
   add_filter '/vendor/'
 end
+
+SimpleCov.formatter = SimpleCov::Formatter::Codecov if ENV['CI'] == 'true'
 
 require 'aws-sdk'
 

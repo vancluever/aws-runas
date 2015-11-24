@@ -2,3 +2,7 @@ langauge: ruby
 rvm:
   - "2.2.3"
   - "2.1.7"
+before_install:
+  - pip install codecov
+after_success:
+  - codecov

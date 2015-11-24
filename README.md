@@ -1,3 +1,6 @@
+[![Build Status](https://img.shields.io/travis/vancluever/aws-runas.svg)](https://travis-ci.org/vancluever/aws-runas)
+[![Gem Version](https://img.shields.io/gem/v/aws_runas.svg)](https://rubygems.org/gems/aws_runas)
+
 aws-runas
 ==========
 

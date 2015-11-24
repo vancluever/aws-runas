@@ -2,7 +2,3 @@ langauge: ruby
 rvm:
   - "2.2.3"
   - "2.1.7"
-before_install:
-  - pip install --user $(whoami) codecov
-after_success:
-  - PATH=$HOME/.local/bin:$PATH codecov

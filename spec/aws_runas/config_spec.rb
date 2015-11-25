@@ -43,6 +43,12 @@ describe AwsRunAs::Config do
         expect(@cfg.load_config_value(key: 'region')).to eq('us-east-1')
       end
     end
+
+    describe '#load_source_profile' do
+      it 'returns the default profile when no source profile is present' do
+        expect(@cfg.load_source_profile).to eq('default')
+      end
+    end
   end
 
   context 'with profile set to test-profile' do

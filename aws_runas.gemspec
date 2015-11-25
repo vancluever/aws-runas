@@ -35,14 +35,14 @@ Gem::Specification.new do |spec|
   spec.cert_chain  = ['certs/vancluever.pem']
   spec.signing_key = File.expand_path('~/.ssh/gem-private_key.pem') if $PROGRAM_NAME =~ /gem\z/
 
-  spec.required_ruby_version = ['>= 2.1.7']
+  spec.required_ruby_version = ['>= 2.1']
 
-  spec.add_dependency 'aws-sdk', '~> 2.2.1'
-  spec.add_dependency 'inifile', '~> 3.0.0'
-  spec.add_dependency 'trollop', '~> 2.1.2'
+  spec.add_dependency 'aws-sdk', '~> 2.2'
+  spec.add_dependency 'inifile', '~> 3.0'
+  spec.add_dependency 'trollop', '~> 2.1'
 
-  spec.add_development_dependency 'rake', '~> 10.4.2'
-  spec.add_development_dependency 'rspec', '~> 3.4.0'
-  spec.add_development_dependency 'simplecov', '~> 0.10.0'
-  spec.add_development_dependency 'codecov', '~> 0.1.2'
+  spec.add_development_dependency 'rake', '~> 10.4'
+  spec.add_development_dependency 'rspec', '~> 3.4'
+  spec.add_development_dependency 'simplecov', '~> 0.10'
+  spec.add_development_dependency 'codecov', '~> 0.1'
 end

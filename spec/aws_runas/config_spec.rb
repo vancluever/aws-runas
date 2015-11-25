@@ -71,7 +71,7 @@ describe AwsRunAs::Config do
 
     describe '#load_source_profile' do
       it 'loads the source credentials profile for the the non-default profile' do
-        expect(@cfg.load_source_profile).to eq('default')
+        expect(@cfg.load_source_profile).to eq('test-credentials')
       end
     end
   end

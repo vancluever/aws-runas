@@ -51,7 +51,7 @@ module AwsRunAs
     def load_source_profile
       source_profile = load_config_value(key: 'source_profile')
       return source_profile if source_profile
-      profile
+      @profile
     end
   end
 end

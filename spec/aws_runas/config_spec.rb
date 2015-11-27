@@ -82,6 +82,18 @@ describe AwsRunAs::Config do
     end
   end
 
+  context 'with profile set to an invalid profile' do
+    before(:context) do
+      @cfg = AwsRunAs::Config.new(path: MOCK_AWS_CONFIGPATH, profile: 'bad-profile')
+    end
+
+    describe '#load_config_value' do
+      it 'raises a NameError when a value load is attempted' do
+        expect { @cfg.load_config_value(key: 'region') }.to raise_error(NameError)
+      end
+    end
+  end
+
   context 'with an invalid config file supplied' do
     describe '#load_config_value' do
       it 'raises a Errno::ENOENT error' do

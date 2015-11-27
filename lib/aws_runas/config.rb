@@ -29,6 +29,7 @@ module AwsRunAs
     def initialize(path:, profile:)
       @path = path
       @path = self.class.find_config_file unless @path
+      fail(Errno::ENOENT, "#{@path}") unless File.exist?(@path.to_s)
       @profile = profile
     end
 
@@ -36,7 +37,7 @@ module AwsRunAs
     def load_config_value(key:)
       section = @profile
       section = "profile #{@profile}" unless @profile == 'default'
-      aws_config = IniFile.load(@path) if File.exist?(@path)
+      aws_config = IniFile.load(@path)
       nil unless aws_config
       aws_config[section][key]
     end

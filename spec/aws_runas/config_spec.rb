@@ -82,13 +82,13 @@ describe AwsRunAs::Config do
     end
 
     describe 'with an invalid config file supplied' do
-      before(:context) do
-        @cfg = AwsRunAs::Config.new(path: '/bad/path/here', profile: 'default')
-      end
-
       describe '#load_config_value' do
         it 'raises a Errno::ENOENT error' do
-          expect { @cfg.load_config_value(key: 'region') }.to raise_error(Errno::ENOENT)
+          expect do
+            AwsRunAs::Config.new(
+              path: '/bad/path/here', profile: 'default'
+            )
+          end.to raise_error(Errno::ENOENT)
         end
       end
     end

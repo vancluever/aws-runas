@@ -38,7 +38,9 @@ module AwsRunAs
       section = @profile
       section = "profile #{@profile}" unless @profile == 'default'
       aws_config = IniFile.load(@path)
-      nil unless aws_config
+      unless aws_config.has_section?(section)
+        fail(NameError, "Profile #{@profile} not found in #{@path}")
+      end
       aws_config[section][key]
     end
 

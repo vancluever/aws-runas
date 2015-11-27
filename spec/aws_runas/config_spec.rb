@@ -80,5 +80,17 @@ describe AwsRunAs::Config do
         expect(@cfg.load_source_profile).to eq('test-credentials')
       end
     end
+
+    describe 'with an invalid config file supplied' do
+      before(:context) do
+        @cfg = AwsRunAs::Config.new(path: '/bad/path/here', profile: 'default')
+      end
+
+      describe '#load_config_value' do
+        it 'raises a Errno::ENOENT error' do
+          expect { @cfg.load_config_value(key: 'region') }.to raise_error(Errno::ENOENT)
+        end
+      end
+    end
   end
 end

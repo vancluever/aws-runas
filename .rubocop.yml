@@ -3,3 +3,5 @@ Metrics/LineLength:
 Style/HashSyntax:
   Exclude:
     - Rakefile
+AllCops:
+  TargetRubyVersion: 2.1

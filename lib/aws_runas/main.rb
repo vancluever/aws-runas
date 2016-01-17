@@ -13,19 +13,20 @@
 # limitations under the License.
 
 require 'aws_runas/config'
+require 'aws_runas/utils'
 require 'aws-sdk'
 
 module AwsRunAs
   # Main program logic for aws-runas - sets up sts asession and assumed role,
   # and hands off environment to called process.
   class Main
-    # Instantiate the object and set up the path, profile, and
+    # Instantiate the object and set up the path, profile, and populate MFA
     def initialize(path: nil, profile: default, mfa_code: nil)
-      if path
-        cfg_path = path
-      else
-        cfg_path = AwsRunAs::Config.find_config_file
-      end
+      cfg_path = if path
+                   path
+                 else
+                   AwsRunAs::Config.find_config_file
+                 end
       @cfg = AwsRunAs::Config.new(path: cfg_path, profile: profile)
       @mfa_code = mfa_code
     end
@@ -62,7 +63,7 @@ module AwsRunAs
 
     def handoff(command: nil, argv: nil)
       env = credentials_env
-      command = '/bin/sh' unless command
+      command = AwsRunAs::Utils.shell unless command
       exec(env, command, *argv)
     end
   end

@@ -58,6 +58,7 @@ describe AwsRunAs::Main do
   describe '#handoff' do
     before(:context) do
       @env = @main.credentials_env
+      ENV.store('SHELL', '/bin/sh')
     end
 
     it 'calls exec with the environment properly set' do

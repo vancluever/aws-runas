@@ -30,7 +30,7 @@ module AwsRunAs
           Usage:
             aws-runas [options] COMMAND ARGS
 
-          If COMMAND is omitted, the default shell (/bin/sh) will
+          If COMMAND is omitted, the default shell ($SHELL or /bin/sh) will
           launch.
 
           [options] are:
@@ -58,7 +58,11 @@ module AwsRunAs
       @cfg = AwsRunAs::Config.new(path: path, profile: profile)
       return nil unless @cfg.mfa_required?
       puts 'Enter MFA code:'
-      STDIN.noecho(&:gets).chomp
+      begin
+        STDIN.noecho(&:gets).chomp
+      rescue Errno::EBADF
+        STDIN.gets.chomp
+      end
     end
   end
 end

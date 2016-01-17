@@ -36,8 +36,8 @@ aws-runas: Run commands under AWS IAM roles
 Usage:
   aws-runas [options] COMMAND ARGS
 
-If COMMAND is omitted, the default shell (/bin/sh) will
-launch.
+If COMMAND is omitted, the default shell ($SHELL, /bin/sh, or cmd.exe,
+depending on your system) will launch.
 
 [options] are:
   -p, --path=<s>       Path to the AWS config file
@@ -50,6 +50,24 @@ following order:
 
  * `aws_config`, in the current working directory
  * `~/.aws/config`, in your user directory.
+
+
+Usage on Windows
+-----------------
+
+`aws_runas` works on Windows platforms, but YMMV. The gem has been tested
+lightly on Cygwin and MinGW32, and if I needed to recommend one over the other,
+I would recommend Cygwin.
+
+If you want to use the gem on Windows without Cygwin, the following below may
+be necessary:
+
+### OpenSSL Cert Bundle for Windows
+
+OpenSSL does not come pre-bundled on with a CA certificate bundle on non-Cygwin
+Windows installations. To get this working with that, you will need to get
+the certificate bundle from somewhere like [here](http://curl.haxx.se/docs/caextract.html)
+and set your SSL_CERT_FILE environment variable to go to the file.
 
 
 Author

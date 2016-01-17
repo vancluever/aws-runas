@@ -30,8 +30,8 @@ module AwsRunAs
           Usage:
             aws-runas [options] COMMAND ARGS
 
-          If COMMAND is omitted, the default shell ($SHELL or /bin/sh) will
-          launch.
+          If COMMAND is omitted, the default shell ($SHELL, /bin/sh, or cmd.exe,
+          depending on your system) will launch.
 
           [options] are:
         EOS

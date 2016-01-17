@@ -18,18 +18,15 @@ module AwsRunAs
   # Utility functions that aren't specifically tied to a class.
   module Utils
     # load the shell for a specific operating system.
-    # if $SHELL exists, then load that, if not, default to /bin/sh.
-    # will expand in the future to allow for some windows stuff.
+    # if $SHELL exists, load that.
     def self.shell
-      path = if ENV.include?('SHELL')
-               ENV['SHELL']
-             else
-               '/bin/sh'
-             end
-      # Detect windows.
-      path += '.exe' if File.exist?("#{path}.exe") &&
-                        RbConfig::CONFIG['host_os'] =~ /mswin|windows|cygwin/i
-      path
+      if RbConfig::CONFIG['host_os'] =~ /mswin|windows|mingw32/i
+        'cmd.exe'
+      elsif ENV.include?('SHELL')
+        ENV['SHELL']
+      else
+        '/bin/sh'
+      end
     end
   end
 end

@@ -15,38 +15,37 @@
 require 'spec_helper'
 
 describe AwsRunAs::Utils do
-  context 'Non-Windows OS' do
-    context 'No $SHELL set' do
+  describe '::shell' do
+    context 'Non-Windows OS' do
+      context 'No $SHELL set' do
+        before(:context) do
+          ENV.delete('SHELL')
+        end
+
+        it 'returns /bin/sh as the shell' do
+          expect(AwsRunAs::Utils.shell).to eq '/bin/sh'
+        end
+      end
+
+      context 'With $SHELL set as /bin/bash' do
+        before(:context) do
+          ENV.store('SHELL', '/bin/bash')
+        end
+
+        it 'returns /bin/bash as the shell' do
+          expect(AwsRunAs::Utils.shell).to eq '/bin/bash'
+        end
+      end
+    end
+
+    context 'Windows OS' do
       before(:context) do
         ENV.delete('SHELL')
-      end
-
-      it 'returns /bin/sh as the shell' do
-        expect(AwsRunAs::Utils.shell).to eq '/bin/sh'
-      end
-    end
-
-    context 'With $SHELL set as /bin/bash' do
-      before(:context) do
-        ENV.store('SHELL', '/bin/bash')
-      end
-
-      it 'returns /bin/bash as the shell' do
-        expect(AwsRunAs::Utils.shell).to eq '/bin/bash'
-      end
-    end
-  end
-
-  context 'Windows OS' do
-    context 'With $SHELL set as /bin/bash' do
-      before(:context) do
-        ENV.store('SHELL', '/bin/bash')
         RbConfig::CONFIG.store('host_os', 'windows')
       end
 
-      it 'returns /bin/bash.exe as the shell' do
-        allow(File).to receive(:exist?).with('/bin/bash.exe').and_return(true)
-        expect(AwsRunAs::Utils.shell).to eq '/bin/bash.exe'
+      it 'returns cmd.exe as the shell' do
+        expect(AwsRunAs::Utils.shell).to eq 'cmd.exe'
       end
     end
   end

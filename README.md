@@ -64,10 +64,10 @@ be necessary:
 
 ### OpenSSL Cert Bundle for Windows
 
-OpenSSL does not come pre-bundled on with a CA certificate bundle on non-Cygwin
+OpenSSL does not come pre-bundled with a CA certificate bundle on non-Cygwin
 Windows installations. To get this working with that, you will need to get
 the certificate bundle from somewhere like [here](http://curl.haxx.se/docs/caextract.html)
-and set your SSL_CERT_FILE environment variable to go to the file.
+and set your `SSL_CERT_FILE` environment variable to go to the file.
 
 
 Author

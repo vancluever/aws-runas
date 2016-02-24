@@ -37,7 +37,7 @@ module AwsRunAs
         EOS
 
         opt :path, 'Path to the AWS config file', type: String
-        opt :profile, 'The AWS profile to load', type: String, default: 'default'
+        opt :profile, 'The AWS profile to load', type: String, default: 'default', multi: true
         stop_on_unknown
       end
     end
@@ -47,9 +47,8 @@ module AwsRunAs
     def start
       opts = load_opts
       mfa_code = read_mfa_if_needed(path: opts[:path], profile: opts[:profile])
-      @main = AwsRunAs::Main.new(path: opts[:path], profile: opts[:profile], mfa_code: mfa_code)
-      @main.assume_role
       command = ARGV.shift
+      @main = AwsRunAs::Main.new(path: opts[:path], profile: opts[:profile], mfa_code: mfa_code)
       @main.handoff(command: command, argv: ARGV)
     end
 

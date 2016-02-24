@@ -27,15 +27,8 @@ module AwsRunAs
                  else
                    AwsRunAs::Config.find_config_file
                  end
-      @cfg = load_cfgs(path: cfg_path, profile: profile)
+      @cfg = AwsRunAs::Config.new(path: cfg_path, profile: profile)
       @mfa_code = mfa_code
-    end
-
-    def load_cfgs(path:, profiles:)
-      cfg = []
-      profiles.each do |profile|
-        cfg.push(AwsRunAs::Config.new(path: path, profile: profile))
-      end
     end
 
     def sts_client
@@ -68,16 +61,7 @@ module AwsRunAs
       env
     end
 
-    # Begin the command handoff. Assume a role, and run a command.
     def handoff(command: nil, argv: nil)
-      if @cfg.length > 1 && command.nil?
-        fail 'Cannot run multiple profiles with a shell'
-      end
-      @cfg.each do |config|
-      end
-    end
-
-    def handoff_run(command: nil, argv: nil)
       env = credentials_env
       command = AwsRunAs::Utils.shell unless command
       exec(env, command, *argv)

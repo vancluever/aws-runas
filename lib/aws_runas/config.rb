@@ -46,7 +46,7 @@ module AwsRunAs
 
     # Checks to see if MFA is required for a specific profile.
     def mfa_required?
-      return true if load_config_value(key: 'mfa_serial')
+      return true if load_config_value(key: 'mfa_serial') && !ENV.include?('AWS_SESSION_TOKEN')
       false
     end
 

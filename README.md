@@ -40,6 +40,7 @@ If COMMAND is omitted, the default shell ($SHELL, /bin/sh, or cmd.exe,
 depending on your system) will launch.
 
 [options] are:
+  -n, --no-role        Get a session token only, do not assume a role
   -p, --path=<s>       Path to the AWS config file
   -r, --profile=<s>    The AWS profile to load (default: default)
   -h, --help           Show this message

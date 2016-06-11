@@ -36,7 +36,7 @@ module AwsRunAs
           [options] are:
         EOS
 
-        opt :no_role, 'Set a SESSION_TOKEN only, do not assume a role', type: TrueClass, default: nil
+        opt :no_role, 'Get a session token only, do not assume a role', type: TrueClass, default: nil
         opt :path, 'Path to the AWS config file', type: String
         opt :profile, 'The AWS profile to load', type: String, default: 'default'
         stop_on_unknown

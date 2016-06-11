@@ -36,6 +36,7 @@ module AwsRunAs
           [options] are:
         EOS
 
+        opt :no_role, 'Set a SESSION_TOKEN only, do not assume a role', type: TrueClass, default: nil
         opt :path, 'Path to the AWS config file', type: String
         opt :profile, 'The AWS profile to load', type: String, default: 'default'
         stop_on_unknown
@@ -47,7 +48,7 @@ module AwsRunAs
     def start
       opts = load_opts
       mfa_code = read_mfa_if_needed(path: opts[:path], profile: opts[:profile])
-      @main = AwsRunAs::Main.new(path: opts[:path], profile: opts[:profile], mfa_code: mfa_code)
+      @main = AwsRunAs::Main.new(path: opts[:path], profile: opts[:profile], mfa_code: mfa_code, no_role: opts[:no_role])
       @main.assume_role
       command = ARGV.shift
       @main.handoff(command: command, argv: ARGV)

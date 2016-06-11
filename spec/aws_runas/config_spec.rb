@@ -73,6 +73,12 @@ describe AwsRunAs::Config do
         expect(@cfg.instance_variable_get('@profile')).to eq('test-profile')
         expect(@cfg.mfa_required?).to be true
       end
+
+      it 'confirms MFA is not required if AWS_SESSION_TOKEN is set' do
+        expect(@cfg.instance_variable_get('@profile')).to eq('test-profile')
+        expect(@cfg.mfa_required?).to be true
+        ENV.store('AWS_SESSION_TOKEN', 'foo')
+      end
     end
 
     describe '#load_source_profile' do

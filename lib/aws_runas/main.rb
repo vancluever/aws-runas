@@ -21,7 +21,7 @@ module AwsRunAs
   # and hands off environment to called process.
   class Main
     # Instantiate the object and set up the path, profile, and populate MFA
-    def initialize(path: nil, profile: default, mfa_code: nil)
+    def initialize(path: nil, profile: default, mfa_code: nil, no_role: nil)
       cfg_path = if path
                    path
                  else
@@ -29,6 +29,7 @@ module AwsRunAs
                  end
       @cfg = AwsRunAs::Config.new(path: cfg_path, profile: profile)
       @mfa_code = mfa_code
+      @no_role = no_role
     end
 
     def sts_client
@@ -43,14 +44,23 @@ module AwsRunAs
     def assume_role
       session_id = "aws-runas-session_#{Time.now.to_i}"
       role_arn = @cfg.load_config_value(key: 'role_arn')
-      mfa_serial = @cfg.load_config_value(key: 'mfa_serial')
-      @role_credentials = Aws::AssumeRoleCredentials.new(
-        client: sts_client,
-        role_arn: role_arn,
-        serial_number: mfa_serial,
-        token_code: @mfa_code,
-        role_session_name: session_id
-      ).credentials
+      mfa_serial = @cfg.load_config_value(key: 'mfa_serial') unless ENV.include?('AWS_SESSION_TOKEN')
+      if @no_role
+        raise 'No mfa_serial in selected profile, session will be useless' if mfa_serial.nil?
+        @role_credentials = sts_client.get_session_token(
+          duration_seconds: 3600,
+          serial_number: mfa_serial,
+          token_code: @mfa_code
+        ).credentials
+      else
+        @role_credentials = Aws::AssumeRoleCredentials.new(
+          client: sts_client,
+          role_arn: role_arn,
+          serial_number: mfa_serial,
+          token_code: @mfa_code,
+          role_session_name: session_id
+        ).credentials
+      end
     end
 
     def credentials_env

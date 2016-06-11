@@ -1,8 +1,18 @@
-aws_runas CHANGELOG
-====================
+## v0.3.0
 
-0.2.0 (Sat Jan 16 23:44:56 PST 2016)
--------------------------------------
+Add session only features:
+
+ * Add the `--no-role` command to load a profile and just get a
+   session token, instead of assuming a role.
+ * Changed default behaviour so that if `AWS_SESSION_TOKEN` exists, no MFA
+   is loaded - this allows the assumption of multiple roles from within
+   the same session.
+ * `--no-role` will fail if a MFA serial is not present (it's pretty much
+   useless - you will just be getting a session for the same access
+   key/secret key with the same level of privilege that you did before).
+
+
+## v0.2.0
 
  * `$SHELL` is now supported - if this environment variable exists, the shell
    in it will be launched.
@@ -11,14 +21,12 @@ aws_runas CHANGELOG
   * Fixes to support mingw32 such as IO flushing and detection of a lack of
     `noecho` support.
 
-0.1.3 (Fri 27 Nov 2015 08:05:45 PST)
--------------------------------------
+## v0.1.3
 
  * Fixed #3 (better handling of invalid profile name).
  * Added guard for invalid file as well.
 
-0.1.2 (Wed 25 Nov 2015 09:09:09 PST)
--------------------------------------
+## v0.1.2
 
  * Fixed #1 and #2 (default credentials fallback bug and overzealous version
    restrictions).

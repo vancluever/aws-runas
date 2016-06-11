@@ -15,6 +15,8 @@
 require 'spec_helper'
 require 'aws_runas/main'
 
+MFA_ERROR = 'No mfa_serial in selected profile, session will be useless'.freeze
+
 describe AwsRunAs::Main do
   before(:context) do
     @main = AwsRunAs::Main.new(
@@ -33,6 +35,37 @@ describe AwsRunAs::Main do
   describe '#assume_role' do
     it 'calls out to Aws::AssumeRoleCredentials.new' do
       expect(Aws::AssumeRoleCredentials).to receive(:new).and_call_original
+      @main.assume_role
+    end
+
+    it 'calls out to Aws::STS::Client.get_session_token when no_role is set' do
+      expect_any_instance_of(Aws::STS::Client).to receive(:get_session_token).and_call_original
+      ENV.delete('AWS_SESSION_TOKEN')
+      @main = AwsRunAs::Main.new(
+        path: MOCK_AWS_CONFIGPATH,
+        profile: 'test-profile',
+        mfa_code: '123456',
+        no_role: true
+      )
+      @main.assume_role
+    end
+
+    it 'raises exception when no_role is set and there is no mfa_serial' do
+      expect do
+        ENV.delete('AWS_SESSION_TOKEN')
+        @main = AwsRunAs::Main.new(
+          path: MOCK_AWS_NO_MFA_PATH,
+          profile: 'test-profile',
+          mfa_code: '123456',
+          no_role: true
+        )
+        @main.assume_role
+      end.to raise_error(MFA_ERROR)
+    end
+
+    it 'calls out to Aws::AssumeRoleCredentials.new with no MFA when AWS_SESSION_TOKEN is set' do
+      expect(Aws::AssumeRoleCredentials).to receive(:new).with(hash_including(serial_number: nil)).and_call_original
+      ENV.store('AWS_SESSION_TOKEN', 'foo')
       @main.assume_role
     end
   end

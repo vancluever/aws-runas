@@ -1,3 +1,12 @@
+## v0.3.1
+
+This update sets `AWS_SDK_CONFIG_OPT_OUT` before the `aws-sdk` Ruby gem is
+loaded to start assuming roles, to disable newer AWS Ruby SDK functionality that
+allows the assumption of roles from `~/.aws/config` directly through the
+toolchain. This conflicts with `aws-runas`'s own config file handling and breaks
+in scenarios where one may want a default `~/.aws/config` file but no
+credentials (ie: instance profiles).
+
 ## v0.3.0
 
 Add session only features:

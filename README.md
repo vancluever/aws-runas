@@ -23,6 +23,11 @@ thing, but there are some differentiators in this gem:
    interactive shell sessions (by supplying no commands).
  * MFA will be auto-detected and only prompted for if necessary (allowing one
    to assume a role that does not have a MFA serial supplied).
+ * Session tokens can be acquired without assuming a role by adding the
+   appropriate `mfa_serial` into the `[default]` profile and running `aws-runas`
+   with `--no-role`. Subsequent uses of `aws-runas` after this will not prompt
+   you for MFA (useful for tooling that needs to assume multiple roles off the
+   same session token).
 
 Usage
 ------

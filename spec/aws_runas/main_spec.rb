@@ -16,6 +16,9 @@ require 'spec_helper'
 require 'aws_runas/main'
 
 MFA_ERROR = 'No mfa_serial in selected profile, session will be useless'.freeze
+AWS_DEFAULT_CFG_PATH = "#{Dir.home}/.aws/config".freeze
+AWS_DEFAULT_CREDENTIALS_PATH = "#{Dir.home}/.aws/credentials".freeze
+AWS_LOCAL_CFG_PATH = "#{Dir.pwd}/aws_config".freeze
 
 describe AwsRunAs::Main do
   before(:context) do
@@ -68,6 +71,31 @@ describe AwsRunAs::Main do
       ENV.store('AWS_SESSION_TOKEN', 'foo')
       @main.assume_role
     end
+
+    context 'with $HOME/.aws/config (test AWS_SDK_CONFIG_OPT_OUT)' do
+      before(:example) do
+        Aws.config.update(stub_responses: false)
+        allow(File).to receive(:exist?).with(AWS_LOCAL_CFG_PATH).and_return false
+        allow(File).to receive(:exist?).with(AWS_DEFAULT_CFG_PATH).and_return true
+        allow(File).to receive(:exist?).with(AWS_DEFAULT_CREDENTIALS_PATH).and_return false
+        allow(File).to receive(:read).with(AWS_DEFAULT_CFG_PATH).and_return File.read(MOCK_AWS_NO_SOURCE_PATH)
+        allow(IniFile).to receive(:load).with(AWS_DEFAULT_CFG_PATH).and_return IniFile.load(MOCK_AWS_NO_SOURCE_PATH)
+        allow(Aws::AssumeRoleCredentials).to receive(:new).and_return(
+          Aws::AssumeRoleCredentials.new(
+            role_arn: 'roleARN',
+            role_session_name: 'roleSessionName',
+            stub_responses: true
+          )
+        )
+        @main = AwsRunAs::Main.new(
+          profile: 'test-profile'
+        )
+      end
+
+      it 'assumes a role correctly' do
+        @main.assume_role
+      end
+    end
   end
 
   describe '#credentials_env' do
@@ -75,16 +103,18 @@ describe AwsRunAs::Main do
       @env = @main.credentials_env
     end
 
-    it 'returns AWS_ACCESS_KEY_ID set in env' do
-      expect(@env['AWS_ACCESS_KEY_ID']).to eq('accessKeyIdType')
-    end
+    context 'with a static, user-defined config path' do
+      it 'returns AWS_ACCESS_KEY_ID set in env' do
+        expect(@env['AWS_ACCESS_KEY_ID']).to eq('accessKeyIdType')
+      end
 
-    it 'returns AWS_SECRET_ACCESS_KEY set in env' do
-      expect(@env['AWS_SECRET_ACCESS_KEY']).to eq('accessKeySecretType')
-    end
+      it 'returns AWS_SECRET_ACCESS_KEY set in env' do
+        expect(@env['AWS_SECRET_ACCESS_KEY']).to eq('accessKeySecretType')
+      end
 
-    it 'returns AWS_SESSION_TOKEN set in env' do
-      expect(@env['AWS_SESSION_TOKEN']).to eq('tokenType')
+      it 'returns AWS_SESSION_TOKEN set in env' do
+        expect(@env['AWS_SESSION_TOKEN']).to eq('tokenType')
+      end
     end
   end
 

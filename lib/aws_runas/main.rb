@@ -14,6 +14,11 @@
 
 require 'aws_runas/config'
 require 'aws_runas/utils'
+
+# AWS_SDK_CONFIG_OPT_OUT must be set here so that we use the pre-2.4 SDK
+# behaviour, which ensures that ~/.aws/config is not re-read when assuming
+# roles.
+ENV.store('AWS_SDK_CONFIG_OPT_OUT', '1')
 require 'aws-sdk'
 
 module AwsRunAs

@@ -16,3 +16,4 @@ require 'spec_helper'
 
 MOCK_AWS_CONFIGPATH = File.expand_path('../files/aws_config', __FILE__)
 MOCK_AWS_NO_MFA_PATH = File.expand_path('../files/aws_config_nomfa', __FILE__)
+MOCK_AWS_NO_SOURCE_PATH = File.expand_path('../files/aws_config_nosource', __FILE__)

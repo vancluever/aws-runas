@@ -58,13 +58,9 @@ module AwsRunAs
     def read_mfa_if_needed(path: nil, profile: 'default')
       @cfg = AwsRunAs::Config.new(path: path, profile: profile)
       return nil unless @cfg.mfa_required?
-      STDOUT.puts 'Enter MFA code:'
+      STDOUT.print 'Enter MFA code: '
       STDOUT.flush
-      begin
-        STDIN.noecho(&:gets).chomp
-      rescue Errno::EBADF
-        STDIN.gets.chomp
-      end
+      STDIN.gets.chomp
     end
   end
 end

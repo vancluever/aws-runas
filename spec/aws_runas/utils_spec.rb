@@ -15,6 +15,31 @@
 require 'spec_helper'
 
 describe AwsRunAs::Utils do
+  describe '::bash_with_prompt' do
+    context 'with RC file' do
+      before(:example) do
+        allow(IO).to receive(:read).with("#{ENV['HOME']}/.bashrc").and_return(BASHRC_FILE_CONTENTS)
+      end
+      it 'runs bash with a properly combined RC file' do
+        expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/bash', '--rcfile', anything)
+        expect_any_instance_of(Tempfile).to receive(:write).with("#{BASHRC_FILE_CONTENTS}\n")
+        expect_any_instance_of(Tempfile).to receive(:write).with(BASHRC_EXPECTED_PROMPT)
+        AwsRunAs::Utils.bash_with_prompt(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
+      end
+    end
+
+    context 'without RC file' do
+      before(:example) do
+        allow(File).to receive(:exist?).with("#{ENV['HOME']}/.bashrc").and_return(false)
+      end
+      it 'runs bash (no RC file found)' do
+        expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/bash', '--rcfile', anything)
+        expect_any_instance_of(Tempfile).to receive(:write).with(BASHRC_EXPECTED_PROMPT)
+        AwsRunAs::Utils.bash_with_prompt(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
+      end
+    end
+  end
+
   describe '::shell' do
     context 'Non-Windows OS' do
       context 'No $SHELL set' do
@@ -46,6 +71,46 @@ describe AwsRunAs::Utils do
 
       it 'returns cmd.exe as the shell' do
         expect(AwsRunAs::Utils.shell).to eq 'cmd.exe'
+      end
+    end
+  end
+
+  describe '::compute_message' do
+    context 'no profile specified' do
+      it 'returns "AWS" with no profile' do
+        expect(AwsRunAs::Utils.compute_message(profile: nil)).to eq 'AWS'
+      end
+    end
+
+    context 'with profile as "rspec"' do
+      it 'returns "AWS:rspec", indicating that is the profile' do
+        expect(AwsRunAs::Utils.compute_message(profile: 'rspec')).to eq 'AWS:rspec'
+      end
+    end
+  end
+
+  describe '::handoff_to_shell' do
+    context 'with shell as bash' do
+      before(:example) do
+        allow(AwsRunAs::Utils).to receive(:shell).and_return('/bin/bash')
+        allow(AwsRunAs::Utils).to receive(:exit)
+      end
+
+      it 'Loads bash with the rspec profile prompt' do
+        expect(AwsRunAs::Utils).to receive(:bash_with_prompt).with(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
+        AwsRunAs::Utils.handoff_to_shell(env: EXPECTED_ENV, profile: 'rspec')
+      end
+    end
+
+    context 'with non-prompt supported shell' do
+      before(:example) do
+        allow(AwsRunAs::Utils).to receive(:shell).and_return('/bin/sh')
+        allow(AwsRunAs::Utils).to receive(:exit)
+      end
+
+      it 'starts a default shell without any args' do
+        expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/sh')
+        AwsRunAs::Utils.handoff_to_shell(env: EXPECTED_ENV, profile: nil)
       end
     end
   end

@@ -124,16 +124,6 @@ describe AwsRunAs::Main do
       ENV.store('SHELL', '/bin/sh')
     end
 
-    it 'calls exec with the environment properly set' do
-      expect(@main).to receive(:exec).with(@env, any_args)
-      @main.handoff
-    end
-
-    it 'starts a shell if no command is specified' do
-      expect(@main).to receive(:exec).with(@env, '/bin/sh', *nil)
-      @main.handoff
-    end
-
     it 'execs a command when a command is specified' do
       expect(@main).to receive(:exec).with(anything, '/usr/bin/foo', *['--bar', 'baz'])
       @main.handoff(command: '/usr/bin/foo', argv: ['--bar', 'baz'])

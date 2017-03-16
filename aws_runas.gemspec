@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.cert_chain  = ['certs/vancluever.pem']
   spec.signing_key = File.expand_path('~/.ssh/gem-private_key.pem') if $PROGRAM_NAME =~ /gem\z/
 
-  spec.required_ruby_version = ['>= 2.1']
+  spec.required_ruby_version = ['>= 2.2.6']
 
   spec.add_dependency 'aws-sdk', '~> 2.6'
   spec.add_dependency 'inifile', '~> 3.0'

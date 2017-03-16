@@ -17,6 +17,7 @@ require 'inifile'
 module AwsRunAs
   # Manages the configuartion file, including loading and retrieving values.
   class Config
+    attr_reader :profile
     # Finds the configuration file (used if no file is specified).
     # paths searched: ./aws_config, and ~/.aws/config.
     def self.find_config_file

@@ -78,7 +78,7 @@ module AwsRunAs
 
     def handoff(command: nil, argv: nil)
       env = credentials_env
-      command = AwsRunAs::Utils.shell unless command
+      AwsRunAs::Utils.handoff_to_shell(env: env, profile: @no_role ? nil : @cfg.profile) unless command
       exec(env, command, *argv)
     end
   end

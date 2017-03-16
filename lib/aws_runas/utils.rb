@@ -13,13 +13,31 @@
 # limitations under the License.
 
 require 'rbconfig'
+require 'tempfile'
+require 'English'
 
 module AwsRunAs
   # Utility functions that aren't specifically tied to a class.
   module Utils
+    module_function
+
+    # Run an interactive bash session with a special streamed RC file.  The RC
+    # merges a local .bashrc if it exists, with a prompt that includes the
+    # computed message from handoff_to_shell.
+    def bash_with_prompt(env:, path:, message:)
+      rc_data = IO.read("#{ENV['HOME']}/.bashrc") if File.exist?("#{ENV['HOME']}/.bashrc")
+      rc_file = Tempfile.new('aws_runas_bashrc')
+      rc_file.write(rc_data)
+      rc_file.write("PS1=\"\\e[33m(#{message})\\e[0m $PS1\"\n")
+      rc_file.close
+      system(env, path, '--rcfile', rc_file.path)
+    ensure
+      rc_file.unlink
+    end
+
     # load the shell for a specific operating system.
     # if $SHELL exists, load that.
-    def self.shell
+    def shell
       if RbConfig::CONFIG['host_os'] =~ /mswin|windows|mingw32/i
         'cmd.exe'
       elsif ENV.include?('SHELL')
@@ -27,6 +45,29 @@ module AwsRunAs
       else
         '/bin/sh'
       end
+    end
+
+    # Compute the message given to the prompt based off supplied profile.
+    def compute_message(profile:)
+      if profile.nil?
+        'AWS'
+      else
+        "AWS:#{profile}"
+      end
+    end
+
+    # "Handoff" to a supported interactive shell. More technically, this runs
+    # an interactive shell with the shell prompt customized to the current
+    # running AWS profile. If the shell is not something we can handle
+    # specifically, just run the shell.
+    def handoff_to_shell(env:, profile: nil)
+      path = shell
+      if path.end_with?('/bash')
+        bash_with_prompt(env: env, path: path, message: compute_message(profile: profile))
+      else
+        system(env, path)
+      end
+      exit $CHILD_STATUS.exitstatus
     end
   end
 end

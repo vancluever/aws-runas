@@ -1,5 +1,7 @@
-## v0.3.2-pre
+## v0.4.0-pre
 
+ * Dropping support for Ruby 2.1. You will need at least Ruby 2.2.6 to be using
+   this gem now. If you have a version below this, please use a v0.3.x version.
  * MFA entry is no longer hidden from the terminal - you will see the digits you
    enter now.
  * Added a special indicator to `bash` prompts when running interactively. This

@@ -1,3 +1,12 @@
+## v0.3.2-pre
+
+ * MFA entry is no longer hidden from the terminal - you will see the digits you
+   enter now.
+ * Added a special indicator to `bash` prompts when running interactively. This
+   prompt displays your running profile, like so: `(AWS:default)`. When running
+   via --no-role, the indicator is just `(AWS)`. This should help to distinguish
+   any AWS shells you may be running between regular ones.
+
 ## v0.3.1
 
 This update sets `AWS_SDK_CONFIG_OPT_OUT` before the `aws-sdk` Ruby gem is

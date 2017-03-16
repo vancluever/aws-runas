@@ -1,4 +1,4 @@
-## v0.4.0-pre
+## v0.4.0
 
  * Dropping support for Ruby 2.1. You will need at least Ruby 2.2.6 to be using
    this gem now. If you have a version below this, please use a v0.3.x version.
@@ -7,7 +7,7 @@
  * Added a special indicator to `bash` prompts when running interactively. This
    prompt displays your running profile, like so: `(AWS:default)`. When running
    via --no-role, the indicator is just `(AWS)`. This should help to distinguish
-   any AWS shells you may be running between regular ones.
+   any AWS shells you may be running from regular ones.
 
 ## v0.3.1
 

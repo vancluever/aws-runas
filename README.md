@@ -5,6 +5,8 @@
 aws-runas
 ==========
 
+[![asciicast](https://asciinema.org/a/107502.png)](https://asciinema.org/a/107502)
+
 **The problem:** You manage AWS across several different roles and need to use
 tools outside of the regular `aws-cli` toolchain.
 

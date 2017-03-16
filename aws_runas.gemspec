@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.description = 'Run a command or shell under an assumed AWS IAM role'
   spec.summary = spec.description
   spec.homepage = 'https://github.com/vancluever/aws-runas'
-  spec.license = 'Apache 2.0'
+  spec.license = 'Apache-2.0'
 
   spec.files = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }

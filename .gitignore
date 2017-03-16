@@ -11,3 +11,5 @@
 # Adding bin and vendor as this should never be vendored in production
 /bin/
 /vendor/
+
+*.gem

@@ -28,7 +28,7 @@ module AwsRunAs
       rc_data = IO.read("#{ENV['HOME']}/.bashrc") if File.exist?("#{ENV['HOME']}/.bashrc")
       rc_file = Tempfile.new('aws_runas_bashrc')
       rc_file.write("#{rc_data}\n") unless rc_data.nil?
-      rc_file.write("PS1=\"\\e[33m(#{message})\\e[0m $PS1\"\n")
+      rc_file.write("PS1=\"\\[\\e[33m\\](#{message})\\[\\e[0m\\] $PS1\"\n")
       rc_file.close
       system(env, path, '--rcfile', rc_file.path)
     ensure

@@ -1,3 +1,9 @@
+## v0.4.1
+
+Fixed the escape sequence in the bash shell prompt indicator so that it has the
+`\[` and `\]` enclosures - this fixes issues that the prompt was having with
+line wrapping.
+
 ## v0.4.0
 
  * Dropping support for Ruby 2.1. You will need at least Ruby 2.2.6 to be using

@@ -1,3 +1,10 @@
+## v0.4.2
+
+The role that aws-runas assumed and the profile it used are now exposed as
+`AWS_RUNAS_ASSUMED_ROLE_ARN` and `AWS_RUNAS_PROFILE`, respectively. These can be
+used in scripts to track the profile being used or the role ARN used, in case
+this data is needed later, or for troubleshooting purposes.
+
 ## v0.4.1
 
 Fixed the escape sequence in the bash shell prompt indicator so that it has the

@@ -73,6 +73,8 @@ module AwsRunAs
       env['AWS_ACCESS_KEY_ID'] = @role_credentials.access_key_id
       env['AWS_SECRET_ACCESS_KEY'] = @role_credentials.secret_access_key
       env['AWS_SESSION_TOKEN'] = @role_credentials.session_token
+      env['AWS_RUNAS_PROFILE'] = @cfg.profile
+      env['AWS_RUNAS_ASSUMED_ROLE_ARN'] = @cfg.load_config_value(key: 'role_arn') unless @no_role
       env
     end
 

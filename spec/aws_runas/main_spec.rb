@@ -99,21 +99,49 @@ describe AwsRunAs::Main do
   end
 
   describe '#credentials_env' do
-    before(:context) do
-      @env = @main.credentials_env
+    before do
+      allow_any_instance_of(AwsRunAs::Main).to receive(:sts_client).and_return(
+        Aws::STS::Client.new(
+          stub_responses: true
+        )
+      )
+    end
+    subject(:env) do
+      ENV.delete('AWS_SESSION_TOKEN')
+      main = AwsRunAs::Main.new(
+        path: MOCK_AWS_CONFIGPATH,
+        profile: 'test-profile',
+        mfa_code: '123456',
+        no_role: no_role
+      )
+      main.assume_role
+      main.credentials_env
+    end
+    let(:no_role) { false }
+
+    context 'with role assumed' do
+      it 'returns AWS_ACCESS_KEY_ID set in env' do
+        expect(env['AWS_ACCESS_KEY_ID']).to eq('accessKeyIdType')
+      end
+      it 'returns AWS_SECRET_ACCESS_KEY set in env' do
+        expect(env['AWS_SECRET_ACCESS_KEY']).to eq('accessKeySecretType')
+      end
+      it 'returns AWS_SESSION_TOKEN set in env' do
+        expect(env['AWS_SESSION_TOKEN']).to eq('tokenType')
+      end
+      it 'has AWS_RUNAS_PROFILE set to the profile in use' do
+        expect(env['AWS_RUNAS_PROFILE']).to eq('test-profile')
+      end
+      it 'has AWS_RUNAS_ASSUMED_ROLE_ARN set to the assumed role ARN' do
+        expect(env['AWS_RUNAS_ASSUMED_ROLE_ARN']).to eq('arn:aws:iam::123456789012:role/test-admin')
+      end
     end
 
-    context 'with a static, user-defined config path' do
-      it 'returns AWS_ACCESS_KEY_ID set in env' do
-        expect(@env['AWS_ACCESS_KEY_ID']).to eq('accessKeyIdType')
-      end
+    context 'with no role assumed' do
+      let(:no_role) { true }
 
-      it 'returns AWS_SECRET_ACCESS_KEY set in env' do
-        expect(@env['AWS_SECRET_ACCESS_KEY']).to eq('accessKeySecretType')
-      end
-
-      it 'returns AWS_SESSION_TOKEN set in env' do
-        expect(@env['AWS_SESSION_TOKEN']).to eq('tokenType')
+      it 'does not have AWS_RUNAS_ASSUMED_ROLE_ARN set' do
+        expect(env).to_not have_key('AWS_RUNAS_ASSUMED_ROLE_ARN')
       end
     end
   end

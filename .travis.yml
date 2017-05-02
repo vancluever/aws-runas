@@ -1,3 +1,4 @@
+dist: trusty
 langauge: ruby
 rvm:
   - "2.4.0"

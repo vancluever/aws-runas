@@ -31,6 +31,26 @@ thing, but there are some differentiators in this gem:
    you for MFA (useful for tooling that needs to assume multiple roles off the
    same session token).
 
+### How it Works
+
+Roles are assumed, or session tokens are simply acquired (if `--no-role` is
+specified) via the `AssumeRole` or the `GetSessionToken` AWS STS API calls.
+After this, your command or shell is launched with the standard AWS credential
+chain environment variables set:
+
+ * `AWS_ACCESS_KEY_ID`
+ * `AWS_SECRET_ACCESS_KEY`
+ * `AWS_SESSION_TOKEN`
+
+### Additional Variables
+
+In addition to the above, two toolchain-local environment variables are set to
+help you determine what credentials are in use locally:
+
+ * `AWS_RUNAS_ASSUMED_ROLE_ARN` - set when a role is assumed (not set if
+   `--no-role` is used)
+ * `AWS_RUNAS_PROFILE` - set with the profile used when aws-runas was run
+
 Usage
 ------
 

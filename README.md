@@ -92,10 +92,10 @@ Usage on Windows
 -----------------
 
 `aws_runas` works on Windows platforms, but YMMV. The gem has been tested
-lightly on Cygwin and MSYS. Cygwin works great if you the self-contained Ruby
-ecosystem. Operating on MSYS or bare Windows will probably work as well as any
-other Ruby gem. Running on WSL has not been tested, but as long as you can get
-the minimum required Ruby version on it (currently >= 2.2.6), it should
+lightly on Cygwin and MSYS. Cygwin works great if you use the self-contained
+Ruby ecosystem. Operating on MSYS or bare Windows will probably work as well as
+any other Ruby gem. Running on WSL has not been tested, but as long as you can
+get the minimum required Ruby version on it (currently >= 2.2.6), it should
 generally work.
 
 ### OpenSSL Cert Bundle for Windows

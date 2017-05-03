@@ -31,7 +31,8 @@ thing, but there are some differentiators in this gem:
    you for MFA (useful for tooling that needs to assume multiple roles off the
    same session token).
 
-### How it Works
+How it Works
+-------------
 
 Roles are assumed, or session tokens are simply acquired (if `--no-role` is
 specified) via the `AssumeRole` or the `GetSessionToken` AWS STS API calls.
@@ -49,7 +50,14 @@ help you determine what credentials are in use locally:
 
  * `AWS_RUNAS_ASSUMED_ROLE_ARN` - set when a role is assumed (not set if
    `--no-role` is used)
- * `AWS_RUNAS_PROFILE` - set with the profile used when aws-runas was run
+ * `AWS_RUNAS_PROFILE` - set with the profile used when `aws-runas` was run
+
+### Fancy Bash Prompt
+
+If you use `aws-runas` without any options and your default shell is Bash, a
+colorized prompt will appear with the profile that is in use if a role is
+assumed, or a simple `(AWS)` indicator added to the prompt if a session token is
+only obtained. See the video at the start of the doc for a demo!
 
 Usage
 ------
@@ -84,18 +92,18 @@ Usage on Windows
 -----------------
 
 `aws_runas` works on Windows platforms, but YMMV. The gem has been tested
-lightly on Cygwin and MinGW32, and if I needed to recommend one over the other,
-I would recommend Cygwin.
-
-If you want to use the gem on Windows without Cygwin, the following below may
-be necessary:
+lightly on Cygwin and MSYS. Cygwin works great if you the self-contained Ruby
+ecosystem. Operating on MSYS or bare Windows will probably work as well as any
+other Ruby gem. Running on WSL has not been tested, but as long as you can get
+the minimum required Ruby version on it (currently >= 2.2.6), it should
+generally work.
 
 ### OpenSSL Cert Bundle for Windows
 
-OpenSSL does not come pre-bundled with a CA certificate bundle on non-Cygwin
-Windows installations. To get this working with that, you will need to get
-the certificate bundle from somewhere like [here](http://curl.haxx.se/docs/caextract.html)
-and set your `SSL_CERT_FILE` environment variable to go to the file.
+Running `aws-runas` on native Windows may require the installation of a CA
+certificate bundle. To do this, you will need to get the certificate bundle from
+somewhere like [here](http://curl.haxx.se/docs/caextract.html) and set your
+`SSL_CERT_FILE` environment variable to go to the file.
 
 
 Author
@@ -107,7 +115,7 @@ License
 --------
 
 ```
-Copyright 2015 Chris Marchesi
+Copyright 2015-2017 Chris Marchesi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

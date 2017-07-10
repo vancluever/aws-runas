@@ -102,7 +102,16 @@ describe AwsRunAs::Main do
     before do
       allow_any_instance_of(AwsRunAs::Main).to receive(:sts_client).and_return(
         Aws::STS::Client.new(
-          stub_responses: true
+          stub_responses: {
+            get_session_token: {
+              credentials: {
+                access_key_id: 'accessKeyIdType',
+                secret_access_key: 'accessKeySecretType',
+                session_token: 'tokenType',
+                expiration: Time.utc(2017, "jul", 10, 19, 56, 11)
+              }
+            }
+          }
         )
       )
     end
@@ -119,8 +128,8 @@ describe AwsRunAs::Main do
     end
     let(:no_role) { false }
 
-    context 'with role assumed' do
-      it 'returns AWS_ACCESS_KEY_ID set in env' do
+    context 'with role assumed' do 
+      it 'returns AWS_ACCESS_KEY_ID set in env' do 
         expect(env['AWS_ACCESS_KEY_ID']).to eq('accessKeyIdType')
       end
       it 'returns AWS_SECRET_ACCESS_KEY set in env' do
@@ -135,6 +144,9 @@ describe AwsRunAs::Main do
       it 'has AWS_RUNAS_ASSUMED_ROLE_ARN set to the assumed role ARN' do
         expect(env['AWS_RUNAS_ASSUMED_ROLE_ARN']).to eq('arn:aws:iam::123456789012:role/test-admin')
       end
+      it 'has AWS_REGION set to the session expiration' do
+        expect(env['AWS_REGION']).to eq('us-west-1')
+      end                       
     end
 
     context 'with no role assumed' do
@@ -143,6 +155,15 @@ describe AwsRunAs::Main do
       it 'does not have AWS_RUNAS_ASSUMED_ROLE_ARN set' do
         expect(env).to_not have_key('AWS_RUNAS_ASSUMED_ROLE_ARN')
       end
+      it 'has AWS_SESSION_EXPIRATION set to the session expiration' do
+        expect(env['AWS_SESSION_EXPIRATION']).to eq('2017-07-10 19:56:11 UTC')
+      end
+      it 'has AWS_SESSION_EXPIRATION_EPOCH set to the session expiration' do
+        expect(env['AWS_SESSION_EXPIRATION_EPOCH']).to eq('1499716571')
+      end
+      it 'has AWS_REGION set to the session expiration' do
+        expect(env['AWS_REGION']).to eq('us-west-1')
+      end      
     end
   end
 

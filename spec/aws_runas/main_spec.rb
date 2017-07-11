@@ -114,6 +114,7 @@ describe AwsRunAs::Main do
           }
         )
       )
+      allow_any_instance_of(Aws::AssumeRoleCredentials).to receive(:expiration).and_return(Time.utc(2017, "jul", 10, 19, 56, 11))
     end
     subject(:env) do
       ENV.delete('AWS_SESSION_TOKEN')
@@ -129,7 +130,7 @@ describe AwsRunAs::Main do
     let(:no_role) { false }
 
     context 'with role assumed' do 
-      it 'returns AWS_ACCESS_KEY_ID set in env' do 
+      it 'returns AWS_ACCESS_KEY_ID set in env' do        
         expect(env['AWS_ACCESS_KEY_ID']).to eq('accessKeyIdType')
       end
       it 'returns AWS_SECRET_ACCESS_KEY set in env' do
@@ -144,6 +145,12 @@ describe AwsRunAs::Main do
       it 'has AWS_RUNAS_ASSUMED_ROLE_ARN set to the assumed role ARN' do
         expect(env['AWS_RUNAS_ASSUMED_ROLE_ARN']).to eq('arn:aws:iam::123456789012:role/test-admin')
       end
+      it 'has AWS_SESSION_EXPIRATION set to the session expiration' do
+        expect(env['AWS_SESSION_EXPIRATION']).to eq('2017-07-10 19:56:11 UTC')
+      end
+      it 'has AWS_SESSION_EXPIRATION_EPOCH set to the session expiration' do
+        expect(env['AWS_SESSION_EXPIRATION_EPOCH']).to eq('1499716571')
+      end      
       it 'has AWS_REGION set to the session expiration' do
         expect(env['AWS_REGION']).to eq('us-west-1')
       end                       

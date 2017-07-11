@@ -145,13 +145,13 @@ describe AwsRunAs::Main do
       it 'has AWS_RUNAS_ASSUMED_ROLE_ARN set to the assumed role ARN' do
         expect(env['AWS_RUNAS_ASSUMED_ROLE_ARN']).to eq('arn:aws:iam::123456789012:role/test-admin')
       end
-      it 'has AWS_SESSION_EXPIRATION set to the session expiration' do
+      it 'has AWS_SESSION_EXPIRATION set in env' do
         expect(env['AWS_SESSION_EXPIRATION']).to eq('2017-07-10 19:56:11 UTC')
       end
-      it 'has AWS_SESSION_EXPIRATION_EPOCH set to the session expiration' do
+      it 'has AWS_SESSION_EXPIRATION_EPOCH set in env' do
         expect(env['AWS_SESSION_EXPIRATION_EPOCH']).to eq('1499716571')
       end      
-      it 'has AWS_REGION set to the session expiration' do
+      it 'has AWS_REGION set in env' do
         expect(env['AWS_REGION']).to eq('us-west-1')
       end                       
     end
@@ -162,12 +162,12 @@ describe AwsRunAs::Main do
       it 'does not have AWS_RUNAS_ASSUMED_ROLE_ARN set' do
         expect(env).to_not have_key('AWS_RUNAS_ASSUMED_ROLE_ARN')
       end
-      it 'has AWS_SESSION_EXPIRATION set to the session expiration' do
+      it 'has AWS_SESSION_EXPIRATION set in env' do
         expect(env['AWS_SESSION_EXPIRATION']).to eq('2017-07-10 19:56:11 UTC')
       end
-      it 'has AWS_SESSION_EXPIRATION_EPOCH set to the session expiration' do
+      it 'has AWS_SESSION_EXPIRATION_EPOCH set in env' do
         expect(env['AWS_SESSION_EXPIRATION_EPOCH']).to eq('1499716571')
-      end
+      end      
       it 'has AWS_REGION set to the session expiration' do
         expect(env['AWS_REGION']).to eq('us-west-1')
       end      

@@ -81,10 +81,10 @@ module AwsRunAs
       env['AWS_REGION'] = @cfg.load_config_value(key: 'region')    
       if @no_role
         env['AWS_SESSION_EXPIRATION'] = "#{session_credentials.expiration}"
-        env['AWS_SESSION_EXPIRATION_EPOCH'] = DateTime.parse("#{session_credentials.expiration}").strftime('%s')
+        env['AWS_SESSION_EXPIRATION_UNIX'] = DateTime.parse("#{session_credentials.expiration}").strftime('%s')
       else
         env['AWS_SESSION_EXPIRATION'] = "#{@session.expiration}"
-        env['AWS_SESSION_EXPIRATION_EPOCH'] = DateTime.parse("#{@session.expiration}").strftime('%s')          
+        env['AWS_SESSION_EXPIRATION_UNIX'] = DateTime.parse("#{@session.expiration}").strftime('%s')          
         env['AWS_RUNAS_ASSUMED_ROLE_ARN'] = @cfg.load_config_value(key: 'role_arn')
       end
       env

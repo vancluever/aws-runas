@@ -148,8 +148,8 @@ describe AwsRunAs::Main do
       it 'has AWS_SESSION_EXPIRATION set in env' do
         expect(env['AWS_SESSION_EXPIRATION']).to eq('2017-07-10 19:56:11 UTC')
       end
-      it 'has AWS_SESSION_EXPIRATION_EPOCH set in env' do
-        expect(env['AWS_SESSION_EXPIRATION_EPOCH']).to eq('1499716571')
+      it 'has AWS_SESSION_EXPIRATION_UNIX set in env' do
+        expect(env['AWS_SESSION_EXPIRATION_UNIX']).to eq('1499716571')
       end      
       it 'has AWS_REGION set in env' do
         expect(env['AWS_REGION']).to eq('us-west-1')
@@ -165,10 +165,10 @@ describe AwsRunAs::Main do
       it 'has AWS_SESSION_EXPIRATION set in env' do
         expect(env['AWS_SESSION_EXPIRATION']).to eq('2017-07-10 19:56:11 UTC')
       end
-      it 'has AWS_SESSION_EXPIRATION_EPOCH set in env' do
-        expect(env['AWS_SESSION_EXPIRATION_EPOCH']).to eq('1499716571')
+      it 'has AWS_SESSION_EXPIRATION_UNIX set in env' do
+        expect(env['AWS_SESSION_EXPIRATION_UNIX']).to eq('1499716571')
       end      
-      it 'has AWS_REGION set to the session expiration' do
+      it 'has AWS_REGION set in env' do
         expect(env['AWS_REGION']).to eq('us-west-1')
       end      
     end

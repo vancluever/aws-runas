@@ -108,18 +108,20 @@ describe AwsRunAs::Main do
                 access_key_id: 'accessKeyIdType',
                 secret_access_key: 'accessKeySecretType',
                 session_token: 'tokenType',
-                expiration: Time.utc(2017, "jul", 10, 19, 56, 11)
+                expiration: Time.utc(2017, 'jul', 10, 19, 56, 11)
               }
             }
           }
         )
       )
-      allow_any_instance_of(Aws::AssumeRoleCredentials).to receive(:expiration).and_return(Time.utc(2017, "jul", 10, 19, 56, 11))
+      allow_any_instance_of(Aws::AssumeRoleCredentials).to receive(:expiration).and_return(
+        Time.utc(2017, 'jul', 10, 19, 56, 11)
+      )
     end
     subject(:env) do
       ENV.delete('AWS_SESSION_TOKEN')
       main = AwsRunAs::Main.new(
-        path: MOCK_AWS_CONFIGPATH,
+        path: cfg_path,
         profile: 'test-profile',
         mfa_code: '123456',
         no_role: no_role
@@ -128,9 +130,10 @@ describe AwsRunAs::Main do
       main.credentials_env
     end
     let(:no_role) { false }
+    let(:cfg_path) { MOCK_AWS_CONFIGPATH }
 
-    context 'with role assumed' do 
-      it 'returns AWS_ACCESS_KEY_ID set in env' do        
+    context 'with role assumed' do
+      it 'returns AWS_ACCESS_KEY_ID set in env' do
         expect(env['AWS_ACCESS_KEY_ID']).to eq('accessKeyIdType')
       end
       it 'returns AWS_SECRET_ACCESS_KEY set in env' do
@@ -150,10 +153,10 @@ describe AwsRunAs::Main do
       end
       it 'has AWS_SESSION_EXPIRATION_UNIX set in env' do
         expect(env['AWS_SESSION_EXPIRATION_UNIX']).to eq('1499716571')
-      end      
+      end
       it 'has AWS_REGION set in env' do
         expect(env['AWS_REGION']).to eq('us-west-1')
-      end                       
+      end
     end
 
     context 'with no role assumed' do
@@ -167,10 +170,18 @@ describe AwsRunAs::Main do
       end
       it 'has AWS_SESSION_EXPIRATION_UNIX set in env' do
         expect(env['AWS_SESSION_EXPIRATION_UNIX']).to eq('1499716571')
-      end      
+      end
       it 'has AWS_REGION set in env' do
         expect(env['AWS_REGION']).to eq('us-west-1')
-      end      
+      end
+    end
+
+    context 'with no region in config' do
+      let(:cfg_path) { MOCK_AWS_NO_REGION_PATH }
+
+      it 'does not have AWS_REGION set in env' do
+        expect(env).to_not have_key('AWS_REGION')
+      end
     end
   end
 

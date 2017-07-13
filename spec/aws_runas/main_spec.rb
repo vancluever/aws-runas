@@ -157,6 +157,9 @@ describe AwsRunAs::Main do
       it 'has AWS_REGION set in env' do
         expect(env['AWS_REGION']).to eq('us-west-1')
       end
+      it 'has AWS_DEFAULT_REGION set in env' do
+        expect(env['AWS_DEFAULT_REGION']).to eq('us-west-1')
+      end
     end
 
     context 'with no role assumed' do
@@ -174,6 +177,9 @@ describe AwsRunAs::Main do
       it 'has AWS_REGION set in env' do
         expect(env['AWS_REGION']).to eq('us-west-1')
       end
+      it 'has AWS_DEFAULT_REGION set in env' do
+        expect(env['AWS_DEFAULT_REGION']).to eq('us-west-1')
+      end
     end
 
     context 'with no region in config' do
@@ -181,6 +187,9 @@ describe AwsRunAs::Main do
 
       it 'does not have AWS_REGION set in env' do
         expect(env).to_not have_key('AWS_REGION')
+      end
+      it 'does not have AWS_DEFAULT_REGION set in env' do
+        expect(env).to_not have_key('AWS_DEFAULT_REGION')
       end
     end
   end

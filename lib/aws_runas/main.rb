@@ -78,7 +78,10 @@ module AwsRunAs
       env['AWS_SECRET_ACCESS_KEY'] = session_credentials.secret_access_key
       env['AWS_SESSION_TOKEN'] = session_credentials.session_token
       env['AWS_RUNAS_PROFILE'] = @cfg.profile
-      env['AWS_REGION'] = @cfg.load_config_value(key: 'region') unless @cfg.load_config_value(key: 'region').nil?
+      unless @cfg.load_config_value(key: 'region').nil?
+        env['AWS_REGION'] = @cfg.load_config_value(key: 'region')
+        env['AWS_DEFAULT_REGION'] = @cfg.load_config_value(key: 'region')
+      end
       if @no_role
         env['AWS_SESSION_EXPIRATION'] = session_credentials.expiration.to_s
         env['AWS_SESSION_EXPIRATION_UNIX'] = DateTime.parse(session_credentials.expiration.to_s).strftime('%s')

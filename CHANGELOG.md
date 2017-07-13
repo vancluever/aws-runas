@@ -1,3 +1,14 @@
+## v0.4.3 (Unreleased)
+
+Several environment variables have been added for more quality-of-life when
+working in the shell or aware tools:
+
+ * `AWS_REGION` and `AWS_DEFAULT_REGION`, which pass through the region
+   configured in the profile, if present
+ * `AWS_SESSION_EXPIRATION` and `AWS_SESSION_EXPIRATION_UNIX` to supply the
+   session expiration time, in both human and UNIX timestamps, respectively
+   named.
+
 ## v0.4.2
 
 The role that aws-runas assumed and the profile it used are now exposed as

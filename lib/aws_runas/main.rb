@@ -52,29 +52,41 @@ module AwsRunAs
       mfa_serial = @cfg.load_config_value(key: 'mfa_serial') unless ENV.include?('AWS_SESSION_TOKEN')
       if @no_role
         raise 'No mfa_serial in selected profile, session will be useless' if mfa_serial.nil?
-        @role_credentials = sts_client.get_session_token(
+        @session = sts_client.get_session_token(
           duration_seconds: 3600,
           serial_number: mfa_serial,
           token_code: @mfa_code
-        ).credentials
+        )        
       else
-        @role_credentials = Aws::AssumeRoleCredentials.new(
+        @session = Aws::AssumeRoleCredentials.new(
           client: sts_client,
           role_arn: role_arn,
           serial_number: mfa_serial,
           token_code: @mfa_code,
           role_session_name: session_id
-        ).credentials
+        )
       end
+    end
+
+    def session_credentials
+      @session.credentials
     end
 
     def credentials_env
       env = {}
-      env['AWS_ACCESS_KEY_ID'] = @role_credentials.access_key_id
-      env['AWS_SECRET_ACCESS_KEY'] = @role_credentials.secret_access_key
-      env['AWS_SESSION_TOKEN'] = @role_credentials.session_token
+      env['AWS_ACCESS_KEY_ID'] = session_credentials.access_key_id
+      env['AWS_SECRET_ACCESS_KEY'] = session_credentials.secret_access_key
+      env['AWS_SESSION_TOKEN'] = session_credentials.session_token
       env['AWS_RUNAS_PROFILE'] = @cfg.profile
-      env['AWS_RUNAS_ASSUMED_ROLE_ARN'] = @cfg.load_config_value(key: 'role_arn') unless @no_role
+      env['AWS_REGION'] = @cfg.load_config_value(key: 'region')    
+      if @no_role
+        env['AWS_SESSION_EXPIRATION'] = "#{session_credentials.expiration}"
+        env['AWS_SESSION_EXPIRATION_UNIX'] = DateTime.parse("#{session_credentials.expiration}").strftime('%s')
+      else
+        env['AWS_SESSION_EXPIRATION'] = "#{@session.expiration}"
+        env['AWS_SESSION_EXPIRATION_UNIX'] = DateTime.parse("#{@session.expiration}").strftime('%s')          
+        env['AWS_RUNAS_ASSUMED_ROLE_ARN'] = @cfg.load_config_value(key: 'role_arn')
+      end
       env
     end
 

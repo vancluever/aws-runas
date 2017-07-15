@@ -21,6 +21,11 @@ module AwsRunAs
   module Utils
     module_function
 
+    # Return the path to the shell_profiles directory vendored with the gem.
+    def shell_profiles_dir
+      File.expand_path('../../../shell_profiles', __FILE__)
+    end
+
     # Run an interactive bash session with a special streamed RC file.  The RC
     # merges a local .bashrc if it exists, with a prompt that includes the
     # computed message from handoff_to_shell.

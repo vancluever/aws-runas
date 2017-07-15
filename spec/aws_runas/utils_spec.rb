@@ -15,6 +15,15 @@
 require 'spec_helper'
 
 describe AwsRunAs::Utils do
+  describe '::shell_profiles_dir' do
+    it 'returns an existent path' do
+      expect(File.directory?(AwsRunAs::Utils.shell_profiles_dir)).to be true
+    end
+    it 'returns a path correctly relative to spec file' do
+      expect(AwsRunAs::Utils.shell_profiles_dir).to eq(File.expand_path('../../../shell_profiles', __FILE__))
+    end
+  end
+
   describe '::bash_with_prompt' do
     context 'with RC file' do
       before(:example) do

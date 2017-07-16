@@ -31,12 +31,14 @@ module AwsRunAs
     # Run an interactive bash session with a special streamed RC file.  The RC
     # merges a local .bashrc if it exists, with a prompt that includes the
     # computed message from handoff_to_shell.
-    def bash_with_prompt(env:, path:, message:)
+    def handoff_bash(env:, path:, message:, skip_prompt:)
       rc_data = IO.read("#{ENV['HOME']}/.bashrc") if File.exist?("#{ENV['HOME']}/.bashrc")
       rc_file = Tempfile.new('aws_runas_bashrc')
       rc_file.write("#{rc_data}\n") unless rc_data.nil?
       rc_file.write(IO.read("#{shell_profiles_dir}/sh.profile"))
-      rc_file.write("PS1=\"\\[\\e[\\$(aws_session_status_color)m\\](#{message})\\[\\e[0m\\] $PS1\"\n")
+      unless skip_prompt
+        rc_file.write("PS1=\"\\[\\e[\\$(aws_session_status_color)m\\](#{message})\\[\\e[0m\\] $PS1\"\n")
+      end
       rc_file.close
       system(env, path, '--rcfile', rc_file.path)
     ensure
@@ -46,15 +48,17 @@ module AwsRunAs
     # Run an interactive zsh session with a special streamed RC file.  The RC
     # merges a local .zshrc if it exists, with a prompt that includes the
     # computed message from handoff_to_shell.
-    def zsh_with_prompt(env:, path:, message:)
+    def handoff_zsh(env:, path:, message:, skip_prompt:)
       rc_data = IO.read("#{ENV['HOME']}/.zshrc") if File.exist?("#{ENV['HOME']}/.zshrc")
       rc_dir = Dir.mktmpdir('aws_runas_zsh')
       rc_file = File.new("#{rc_dir}/.zshrc", 'w')
       rc_file.write("#{rc_data}\n") unless rc_data.nil?
       rc_file.write(IO.read("#{shell_profiles_dir}/sh.profile"))
-      rc_file.write("setopt PROMPT_SUBST\n")
-      rc_file.write("export OLDPROMPT=\"${PROMPT}\"\n")
-      rc_file.write("PROMPT=$'%{\\e[\\%}$(aws_session_status_color)m(#{message})%{\\e[0m%} $OLDPROMPT'\n")
+      unless skip_prompt
+        rc_file.write("setopt PROMPT_SUBST\n")
+        rc_file.write("export OLDPROMPT=\"${PROMPT}\"\n")
+        rc_file.write("PROMPT=$'%{\\e[\\%}$(aws_session_status_color)m(#{message})%{\\e[0m%} $OLDPROMPT'\n")
+      end
       rc_file.close
       env.store('ZDOTDIR', rc_dir)
       system(env, path)
@@ -87,12 +91,12 @@ module AwsRunAs
     # an interactive shell with the shell prompt customized to the current
     # running AWS profile. If the shell is not something we can handle
     # specifically, just run the shell.
-    def handoff_to_shell(env:, profile: nil)
+    def handoff_to_shell(env:, profile: nil, skip_prompt:)
       path = shell
       if path.end_with?('/bash')
-        bash_with_prompt(env: env, path: path, message: compute_message(profile: profile))
+        handoff_bash(env: env, path: path, message: compute_message(profile: profile), skip_prompt: skip_prompt)
       elsif path.end_with?('/zsh')
-        zsh_with_prompt(env: env, path: path, message: compute_message(profile: profile))
+        handoff_zsh(env: env, path: path, message: compute_message(profile: profile), skip_prompt: skip_prompt)
       else
         system(env, path)
       end

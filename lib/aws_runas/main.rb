@@ -93,9 +93,11 @@ module AwsRunAs
       env
     end
 
-    def handoff(command: nil, argv: nil)
+    def handoff(command: nil, argv: nil, skip_prompt:)
       env = credentials_env
-      AwsRunAs::Utils.handoff_to_shell(env: env, profile: @no_role ? nil : @cfg.profile) unless command
+      unless command
+        AwsRunAs::Utils.handoff_to_shell(env: env, profile: @no_role ? nil : @cfg.profile, skip_prompt: skip_prompt)
+      end
       exec(env, command, *argv)
     end
   end

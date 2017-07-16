@@ -25,7 +25,7 @@ describe AwsRunAs::Utils do
     end
   end
 
-  describe '::bash_with_prompt' do
+  describe '::handoff_bash' do
     context 'with RC file' do
       before(:example) do
         allow(IO).to receive(:read).with("#{ENV['HOME']}/.bashrc").and_return(BASHRC_FILE_CONTENTS)
@@ -36,7 +36,7 @@ describe AwsRunAs::Utils do
         expect_any_instance_of(Tempfile).to receive(:write).with("#{BASHRC_FILE_CONTENTS}\n")
         expect_any_instance_of(Tempfile).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
         expect_any_instance_of(Tempfile).to receive(:write).with(BASHRC_EXPECTED_PROMPT)
-        AwsRunAs::Utils.bash_with_prompt(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
+        AwsRunAs::Utils.handoff_bash(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec', skip_prompt: false)
       end
     end
 
@@ -49,12 +49,25 @@ describe AwsRunAs::Utils do
         expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/bash', '--rcfile', anything)
         expect_any_instance_of(Tempfile).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
         expect_any_instance_of(Tempfile).to receive(:write).with(BASHRC_EXPECTED_PROMPT)
-        AwsRunAs::Utils.bash_with_prompt(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
+        AwsRunAs::Utils.handoff_bash(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec', skip_prompt: false)
+      end
+    end
+
+    context 'with skip_prompt enabled' do
+      before(:example) do
+        allow(IO).to receive(:read).with("#{ENV['HOME']}/.bashrc").and_return(BASHRC_FILE_CONTENTS)
+        allow(IO).to receive(:read).with("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile").and_call_original
+      end
+      it 'runs bash with a properly combined RC file, but no prompt modification' do
+        expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/bash', '--rcfile', anything)
+        expect_any_instance_of(Tempfile).to receive(:write).with("#{BASHRC_FILE_CONTENTS}\n")
+        expect_any_instance_of(Tempfile).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
+        AwsRunAs::Utils.handoff_bash(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec', skip_prompt: true)
       end
     end
   end
 
-  describe '::zsh_with_prompt' do
+  describe '::handoff_zsh' do
     context 'with RC file' do
       before(:example) do
         allow(IO).to receive(:read).with("#{ENV['HOME']}/.zshrc").and_return(ZSHRC_FILE_CONTENTS)
@@ -69,7 +82,7 @@ describe AwsRunAs::Utils do
         expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_OLDPROMPT)
         expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_PROMPT)
         env = EXPECTED_ENV.dup
-        AwsRunAs::Utils.zsh_with_prompt(env: env, path: '/usr/bin/zsh', message: 'AWS:rspec')
+        AwsRunAs::Utils.handoff_zsh(env: env, path: '/usr/bin/zsh', message: 'AWS:rspec', skip_prompt: false)
       end
     end
 
@@ -86,9 +99,25 @@ describe AwsRunAs::Utils do
         expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_OLDPROMPT)
         expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_PROMPT)
         env = EXPECTED_ENV.dup
-        AwsRunAs::Utils.zsh_with_prompt(env: env, path: '/usr/bin/zsh', message: 'AWS:rspec')
+        AwsRunAs::Utils.handoff_zsh(env: env, path: '/usr/bin/zsh', message: 'AWS:rspec', skip_prompt: false)
       end
     end
+
+    context 'with skip_prompt enabled' do
+      before(:example) do
+        allow(IO).to receive(:read).with("#{ENV['HOME']}/.zshrc").and_return(ZSHRC_FILE_CONTENTS)
+        allow(IO).to receive(:read).with("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile").and_call_original
+      end
+      it 'runs zsh with a properly combined RC file, in special tmp dir' do
+        expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV_ZSH, '/usr/bin/zsh')
+        expect(Dir).to receive(:mktmpdir).with('aws_runas_zsh') { test_mktmpdir }
+        expect_any_instance_of(File).to receive(:write).with("#{ZSHRC_FILE_CONTENTS}\n")
+        expect_any_instance_of(File).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
+        env = EXPECTED_ENV.dup
+        AwsRunAs::Utils.handoff_zsh(env: env, path: '/usr/bin/zsh', message: 'AWS:rspec', skip_prompt: true)
+      end
+    end
+
   end
 
   describe '::shell' do
@@ -148,8 +177,8 @@ describe AwsRunAs::Utils do
       end
 
       it 'Loads bash with the rspec profile prompt' do
-        expect(AwsRunAs::Utils).to receive(:bash_with_prompt).with(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
-        AwsRunAs::Utils.handoff_to_shell(env: EXPECTED_ENV, profile: 'rspec')
+        expect(AwsRunAs::Utils).to receive(:handoff_bash).with(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec', skip_prompt: false)
+        AwsRunAs::Utils.handoff_to_shell(env: EXPECTED_ENV, profile: 'rspec', skip_prompt: false)
       end
     end
 
@@ -161,7 +190,7 @@ describe AwsRunAs::Utils do
 
       it 'starts a default shell without any args' do
         expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/sh')
-        AwsRunAs::Utils.handoff_to_shell(env: EXPECTED_ENV, profile: nil)
+        AwsRunAs::Utils.handoff_to_shell(env: EXPECTED_ENV, profile: nil, skip_prompt: false)
       end
     end
   end

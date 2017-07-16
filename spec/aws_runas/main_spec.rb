@@ -202,7 +202,7 @@ describe AwsRunAs::Main do
 
     it 'execs a command when a command is specified' do
       expect(@main).to receive(:exec).with(anything, '/usr/bin/foo', *['--bar', 'baz'])
-      @main.handoff(command: '/usr/bin/foo', argv: ['--bar', 'baz'])
+      @main.handoff(command: '/usr/bin/foo', argv: ['--bar', 'baz'], skip_prompt: false)
     end
   end
 end

@@ -36,7 +36,7 @@ module AwsRunAs
       rc_file = Tempfile.new('aws_runas_bashrc')
       rc_file.write("#{rc_data}\n") unless rc_data.nil?
       rc_file.write(IO.read("#{shell_profiles_dir}/sh.profile"))
-      rc_file.write("PS1=\"\\[\\e[\\$(session_status_color)m\\](#{message})\\[\\e[0m\\] $PS1\"\n")
+      rc_file.write("PS1=\"\\[\\e[\\$(aws_session_status_color)m\\](#{message})\\[\\e[0m\\] $PS1\"\n")
       rc_file.close
       system(env, path, '--rcfile', rc_file.path)
     ensure
@@ -54,7 +54,7 @@ module AwsRunAs
       rc_file.write(IO.read("#{shell_profiles_dir}/sh.profile"))
       rc_file.write("setopt PROMPT_SUBST\n")
       rc_file.write("export OLDPROMPT=\"${PROMPT}\"\n")
-      rc_file.write("PROMPT=$'%{\\e[\\%}$(session_status_color)m(#{message})%{\\e[0m%} $OLDPROMPT'\n")
+      rc_file.write("PROMPT=$'%{\\e[\\%}$(aws_session_status_color)m(#{message})%{\\e[0m%} $OLDPROMPT'\n")
       rc_file.close
       env.store('ZDOTDIR', rc_dir)
       system(env, path)

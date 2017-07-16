@@ -14,6 +14,8 @@
 
 require 'rbconfig'
 require 'tempfile'
+require 'tmpdir'
+require 'fileutils'
 require 'English'
 
 module AwsRunAs
@@ -33,11 +35,31 @@ module AwsRunAs
       rc_data = IO.read("#{ENV['HOME']}/.bashrc") if File.exist?("#{ENV['HOME']}/.bashrc")
       rc_file = Tempfile.new('aws_runas_bashrc')
       rc_file.write("#{rc_data}\n") unless rc_data.nil?
-      rc_file.write("PS1=\"\\[\\e[33m\\](#{message})\\[\\e[0m\\] $PS1\"\n")
+      rc_file.write(IO.read("#{shell_profiles_dir}/sh.profile"))
+      rc_file.write("PS1=\"\\[\\e[\\$(session_status_color)m\\](#{message})\\[\\e[0m\\] $PS1\"\n")
       rc_file.close
       system(env, path, '--rcfile', rc_file.path)
     ensure
       rc_file.unlink
+    end
+
+    # Run an interactive zsh session with a special streamed RC file.  The RC
+    # merges a local .zshrc if it exists, with a prompt that includes the
+    # computed message from handoff_to_shell.
+    def zsh_with_prompt(env:, path:, message:)
+      rc_data = IO.read("#{ENV['HOME']}/.zshrc") if File.exist?("#{ENV['HOME']}/.zshrc")
+      rc_dir = Dir.mktmpdir('aws_runas_zsh')
+      rc_file = File.new("#{rc_dir}/.zshrc", 'w')
+      rc_file.write("#{rc_data}\n") unless rc_data.nil?
+      rc_file.write(IO.read("#{shell_profiles_dir}/sh.profile"))
+      rc_file.write("setopt PROMPT_SUBST\n")
+      rc_file.write("export OLDPROMPT=\"${PROMPT}\"\n")
+      rc_file.write("PROMPT=$'%{\\e[\\%}$(session_status_color)m(#{message})%{\\e[0m%} $OLDPROMPT'\n")
+      rc_file.close
+      env.store('ZDOTDIR', rc_dir)
+      system(env, path)
+    ensure
+      FileUtils.rmtree(rc_dir)
     end
 
     # load the shell for a specific operating system.
@@ -69,6 +91,8 @@ module AwsRunAs
       path = shell
       if path.end_with?('/bash')
         bash_with_prompt(env: env, path: path, message: compute_message(profile: profile))
+      elsif path.end_with?('/zsh')
+        zsh_with_prompt(env: env, path: path, message: compute_message(profile: profile))
       else
         system(env, path)
       end

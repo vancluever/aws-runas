@@ -13,6 +13,7 @@
 # limitations under the License.
 
 require 'spec_helper'
+require 'tmpdir'
 
 describe AwsRunAs::Utils do
   describe '::shell_profiles_dir' do
@@ -28,10 +29,12 @@ describe AwsRunAs::Utils do
     context 'with RC file' do
       before(:example) do
         allow(IO).to receive(:read).with("#{ENV['HOME']}/.bashrc").and_return(BASHRC_FILE_CONTENTS)
+        allow(IO).to receive(:read).with("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile").and_call_original
       end
       it 'runs bash with a properly combined RC file' do
         expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/bash', '--rcfile', anything)
         expect_any_instance_of(Tempfile).to receive(:write).with("#{BASHRC_FILE_CONTENTS}\n")
+        expect_any_instance_of(Tempfile).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
         expect_any_instance_of(Tempfile).to receive(:write).with(BASHRC_EXPECTED_PROMPT)
         AwsRunAs::Utils.bash_with_prompt(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
       end
@@ -40,11 +43,50 @@ describe AwsRunAs::Utils do
     context 'without RC file' do
       before(:example) do
         allow(File).to receive(:exist?).with("#{ENV['HOME']}/.bashrc").and_return(false)
+        allow(IO).to receive(:read).with("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile").and_call_original
       end
       it 'runs bash (no RC file found)' do
         expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV, '/bin/bash', '--rcfile', anything)
+        expect_any_instance_of(Tempfile).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
         expect_any_instance_of(Tempfile).to receive(:write).with(BASHRC_EXPECTED_PROMPT)
         AwsRunAs::Utils.bash_with_prompt(env: EXPECTED_ENV, path: '/bin/bash', message: 'AWS:rspec')
+      end
+    end
+  end
+
+  describe '::zsh_with_prompt' do
+    context 'with RC file' do
+      before(:example) do
+        allow(IO).to receive(:read).with("#{ENV['HOME']}/.zshrc").and_return(ZSHRC_FILE_CONTENTS)
+        allow(IO).to receive(:read).with("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile").and_call_original
+      end
+      it 'runs zsh with a properly combined RC file, in special tmp dir' do
+        expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV_ZSH, '/usr/bin/zsh')
+        expect(Dir).to receive(:mktmpdir).with('aws_runas_zsh') { test_mktmpdir }
+        expect_any_instance_of(File).to receive(:write).with("#{ZSHRC_FILE_CONTENTS}\n")
+        expect_any_instance_of(File).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
+        expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_SETSUBST)
+        expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_OLDPROMPT)
+        expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_PROMPT)
+        env = EXPECTED_ENV.dup
+        AwsRunAs::Utils.zsh_with_prompt(env: env, path: '/usr/bin/zsh', message: 'AWS:rspec')
+      end
+    end
+
+    context 'without RC file' do
+      before(:example) do
+        allow(File).to receive(:exist?).with("#{ENV['HOME']}/.zshrc").and_return(false)
+        allow(IO).to receive(:read).with("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile").and_call_original
+      end
+      it 'runs zsh (no RC file found)' do
+        expect(AwsRunAs::Utils).to receive(:system).with(EXPECTED_ENV_ZSH, '/usr/bin/zsh')
+        expect(Dir).to receive(:mktmpdir).with('aws_runas_zsh') { test_mktmpdir }
+        expect_any_instance_of(File).to receive(:write).with(IO.read("#{AwsRunAs::Utils.shell_profiles_dir}/sh.profile"))
+        expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_SETSUBST)
+        expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_OLDPROMPT)
+        expect_any_instance_of(File).to receive(:write).with(ZSHRC_EXPECTED_PROMPT)
+        env = EXPECTED_ENV.dup
+        AwsRunAs::Utils.zsh_with_prompt(env: env, path: '/usr/bin/zsh', message: 'AWS:rspec')
       end
     end
   end

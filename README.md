@@ -51,13 +51,38 @@ help you determine what credentials are in use locally:
  * `AWS_RUNAS_ASSUMED_ROLE_ARN` - set when a role is assumed (not set if
    `--no-role` is used)
  * `AWS_RUNAS_PROFILE` - set with the profile used when `aws-runas` was run
+ * `AWS_REGION` and `AWS_DEFAULT_REGION` - set with the region name defined in
+   the profile being used
+ * `AWS_SESSION_EXPIRATION` - set with the expiry timestamp in UTC
+ * `AWS_SESSION_EXPIRATION_UNIX` - set with the expiry timestamp in Unix time,
+   useful for scripting
 
-### Fancy Bash Prompt
+### Fancy Bash/Zsh Prompt
 
-If you use `aws-runas` without any options and your default shell is Bash, a
-colorized prompt will appear with the profile that is in use if a role is
+If you use `aws-runas` without any options and your default shell is Bash or
+Zsh, a colorized prompt will appear with the profile that is in use if a role is
 assumed, or a simple `(AWS)` indicator added to the prompt if a session token is
 only obtained. See the video at the start of the doc for a demo!
+
+#### Shell Integration Functions
+
+2 functions currently get exported when you run under one of the two supported
+shells:
+
+ * `aws_session_expired`, which reads `AWS_SESSION_EXPIRATION_UNIX` (see above)
+   and compares this with the current Unix timestamp supplied by `date`. It
+   returns 0 on true and 1 on false, which can be used semantically in shell
+   scripts.
+ * `aws_session_status_color`, which works off of `aws_session_expired` to
+   render an ANSI numeric color code - red when `aws_session_expired` is `true`,
+   yellow otherwise.
+
+#### Skipping the Fancy Prompt
+
+If you are doing your own prompt customization based on aws-runas data and don't
+want the prompt modified, you can supply `--skip-prompt` to skip the prompt
+modification. The aforementioned integration functions will still be available
+to you however, which you can use in your own scripts.
 
 Usage
 ------
@@ -76,6 +101,7 @@ depending on your system) will launch.
 
 [options] are:
   -n, --no-role        Get a session token only, do not assume a role
+  -s, --skip-prompt    Do not launch interactive sessions with the fancy prompt
   -p, --path=<s>       Path to the AWS config file
   -r, --profile=<s>    The AWS profile to load (default: default)
   -h, --help           Show this message

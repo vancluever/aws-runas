@@ -1,12 +1,12 @@
 ## v0.5.0 (Unreleased)
 
-### zsh Support
+### Zsh Support
 
 `zsh` is now supported for the fancy prompt. When using the shell, your
 existing profile data from `.zshrc` will be copied over into the temporary
 configuration.
 
-### Additional Functionality for bash and zsh
+### Additional Functionality for Bash and Zsh
 
 2 additional functions are available for `bash` and `zsh` as well:
 
@@ -20,6 +20,14 @@ configuration.
 
 The prompts for `bash` and `zsh` now work off of these functions to render the
 right color. The prompt will go red when the session has expired.
+
+### Skip Fancy Interactive Prompt
+
+The default interactive prompt that you get when you run `aws-runas` with no
+command supplied can now by skipped by adding `--skip-prompt` to the CLI
+arguments. The profile functions mentioned above are still passed in. This
+allows you to leverage their functionality inside your own scripts and custom
+prompts if you want in other ways. 
 
 ### Additional Variables
 

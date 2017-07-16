@@ -1,4 +1,27 @@
-## v0.4.3 (Unreleased)
+## v0.5.0 (Unreleased)
+
+### zsh Support
+
+`zsh` is now supported for the fancy prompt. When using the shell, your
+existing profile data from `.zshrc` will be copied over into the temporary
+configuration.
+
+### Additional Functionality for bash and zsh
+
+2 additional functions are available for `bash` and `zsh` as well:
+
+ * `aws_session_expired`, which reads `AWS_SESSION_EXPIRATION_UNIX` (see below)
+   and compares this with the current Unix timestamp supplied by `date`. It
+   returns 0 on true and 1 on false, which can be used semantically in shell
+   scripts.
+ * `aws_session_status_color`, which works off of `aws_session_expired` to
+   render an ANSI numeric color code - red when `aws_session_expired` is `true`,
+   yellow otherwise.
+
+The prompts for `bash` and `zsh` now work off of these functions to render the
+right color. The prompt will go red when the session has expired.
+
+### Additional Variables
 
 Several environment variables have been added for more quality-of-life when
 working in the shell or aware tools:

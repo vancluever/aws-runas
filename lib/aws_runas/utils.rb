@@ -30,9 +30,9 @@ module AwsRunAs
 
     def get_user
       if ENV['OS'].to_s.include? "Windows"
-        username = ENV['USERNAME']
+        username = ENV['USERNAME'].to_s
       else
-        username = ENV['USER']
+        username = ENV['USER'].to_s
       end
       username
     end

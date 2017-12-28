@@ -16,6 +16,10 @@ require 'spec_helper'
 require 'tmpdir'
 
 describe AwsRunAs::Utils do
+  describe '::get_user' do
+      expect(AwsRunAs::Utils.get_user).is_a? String
+  end
+
   describe '::shell_profiles_dir' do
     it 'returns an existent path' do
       expect(File.directory?(AwsRunAs::Utils.shell_profiles_dir)).to be true

@@ -27,7 +27,8 @@ describe AwsRunAs::Utils do
 
     it 'returns user if running on windows' do
       ENV['OS'] = 'Windows_NT'
-      expect(AwsRunAs::Utils.get_user).is_a? String
+      ENV['USERNAME'] = "testtricker"
+      expect(AwsRunAs::Utils.get_user).to eq("testtricker")
     end
   end
 

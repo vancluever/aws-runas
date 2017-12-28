@@ -17,7 +17,13 @@ require 'tmpdir'
 
 describe AwsRunAs::Utils do
   describe '::get_user' do
+    it 'returns a string' do
       expect(AwsRunAs::Utils.get_user).is_a? String
+    end
+
+    it 'is not null' do
+      expect(AwsRunAs::Utils.get_user).not_to be_empty
+    end
   end
 
   describe '::shell_profiles_dir' do

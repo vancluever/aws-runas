@@ -24,6 +24,11 @@ describe AwsRunAs::Utils do
     it 'is not null' do
       expect(AwsRunAs::Utils.get_user).not_to be_empty
     end
+
+    it 'returns user if running on windows' do
+      ENV['OS'] = 'Windows_NT'
+      expect(AwsRunAs::Utils.get_user).is_a? String
+    end
   end
 
   describe '::shell_profiles_dir' do

@@ -47,7 +47,8 @@ module AwsRunAs
     end
 
     def assume_role
-      session_id = "aws-runas-session_#{Time.now.to_i}"
+      username = AwsRunAs::Utils.get_user()
+      session_id = "aws-runas-session_#{username}_#{Time.now.to_i}"
       role_arn = @cfg.load_config_value(key: 'role_arn')
       mfa_serial = @cfg.load_config_value(key: 'mfa_serial') unless ENV.include?('AWS_SESSION_TOKEN')
       if @no_role

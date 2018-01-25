@@ -87,7 +87,7 @@ to you however, which you can use in your own scripts.
 Usage
 ------
 
-Install the gem (`gem install aws-runas`), and the command can be run via
+Install the gem (`gem install aws_runas`), and the command can be run via
 `aws-runas` via your regular `$PATH`.
 
 ```

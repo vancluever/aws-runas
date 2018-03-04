@@ -1,3 +1,9 @@
+## v0.5.1
+
+Fixed the bug where the current PROMPT was not supporting
+shell functions and colors but rather just rendering the old prompt code
+as text. https://github.com/vancluever/aws-runas/issues/13
+
 ## v0.5.0
 
 ### Zsh Support

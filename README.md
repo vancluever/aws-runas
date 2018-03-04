@@ -74,8 +74,9 @@ shells:
    returns 0 on true and 1 on false, which can be used semantically in shell
    scripts.
  * `aws_session_status_color`, which works off of `aws_session_expired` to
-   render an ANSI numeric color code - red when `aws_session_expired` is `true`,
-   yellow otherwise.
+   render either an ANSI color number (for bash)
+   or a human readable color name (for zsh)
+   - (red or 31) when `aws_session_expired` is `true`, (yellow or 33) otherwise.
 
 #### Skipping the Fancy Prompt
 

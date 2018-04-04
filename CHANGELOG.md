@@ -1,3 +1,7 @@
+## v0.6.0
+
+Added support for maximum 12 hour duration session credentials
+
 ## v0.5.0
 
 ### Zsh Support
@@ -27,7 +31,7 @@ The default interactive prompt that you get when you run `aws-runas` with no
 command supplied can now by skipped by adding `--skip-prompt` to the CLI
 arguments. The profile functions mentioned above are still passed in. This
 allows you to leverage their functionality inside your own scripts and custom
-prompts if you want in other ways. 
+prompts if you want in other ways.
 
 ### Additional Variables
 

@@ -26,7 +26,7 @@ module AwsRunAs
   # and hands off environment to called process.
   class Main
     # Instantiate the object and set up the path, profile, and populate MFA
-    def initialize(path: nil, profile: default, mfa_code: nil, no_role: nil)
+    def initialize(path: nil, profile: default, mfa_code: nil, no_role: nil, duration_seconds: 3600)
       cfg_path = if path
                    path
                  else
@@ -35,6 +35,7 @@ module AwsRunAs
       @cfg = AwsRunAs::Config.new(path: cfg_path, profile: profile)
       @mfa_code = mfa_code
       @no_role = no_role
+      @duration_seconds = duration_seconds
     end
 
     def sts_client
@@ -63,7 +64,8 @@ module AwsRunAs
           role_arn: role_arn,
           serial_number: mfa_serial,
           token_code: @mfa_code,
-          role_session_name: session_id
+          role_session_name: session_id,
+          duration_seconds: @duration_seconds
         )
       end
     end

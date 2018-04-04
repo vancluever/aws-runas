@@ -40,6 +40,7 @@ module AwsRunAs
         opt :skip_prompt, 'Do not launch interactive sessions with the fancy prompt', type: TrueClass, default: nil
         opt :path, 'Path to the AWS config file', type: String
         opt :profile, 'The AWS profile to load', type: String, default: 'default'
+        opt :duration, 'The duration in seconds for temporary credentials', type: Integer, default: 3600
         stop_on_unknown
       end
     end
@@ -49,7 +50,7 @@ module AwsRunAs
     def start
       opts = load_opts
       mfa_code = read_mfa_if_needed(path: opts[:path], profile: opts[:profile])
-      @main = AwsRunAs::Main.new(path: opts[:path], profile: opts[:profile], mfa_code: mfa_code, no_role: opts[:no_role])
+      @main = AwsRunAs::Main.new(path: opts[:path], profile: opts[:profile], mfa_code: mfa_code, no_role: opts[:no_role], duration_seconds: opts[:duration])
       @main.assume_role
       command = ARGV.shift
       @main.handoff(command: command, argv: ARGV, skip_prompt: opts[:skip_prompt])

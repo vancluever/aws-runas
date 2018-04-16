@@ -41,6 +41,17 @@ describe AwsRunAs::Main do
       @main.assume_role
     end
 
+    it 'calls out to Aws::AssumeRoleCredentials.new with a correct session expiration when not default' do
+      expect(Aws::AssumeRoleCredentials).to receive(:new).with(hash_including(duration_seconds: 43200)).and_call_original
+      @main = AwsRunAs::Main.new(
+        path: MOCK_AWS_CONFIGPATH,
+        profile: 'test-profile',
+        mfa_code: '123456',
+        duration_seconds: 43200
+      )
+      @main.assume_role
+    end
+
     it 'calls out to Aws::STS::Client.get_session_token when no_role is set' do
       expect_any_instance_of(Aws::STS::Client).to receive(:get_session_token).and_call_original
       ENV.delete('AWS_SESSION_TOKEN')
@@ -49,6 +60,23 @@ describe AwsRunAs::Main do
         profile: 'test-profile',
         mfa_code: '123456',
         no_role: true
+      )
+      @main.assume_role
+    end
+
+    it 'calls out to Aws::STS::Client.get_session_token correct session expiration when not default' do
+      expect_any_instance_of(Aws::STS::Client).to receive(
+        :get_session_token
+      ).with(
+        hash_including(duration_seconds: 43200)
+      ).and_call_original
+      ENV.delete('AWS_SESSION_TOKEN')
+      @main = AwsRunAs::Main.new(
+        path: MOCK_AWS_CONFIGPATH,
+        profile: 'test-profile',
+        mfa_code: '123456',
+        no_role: true,
+        duration_seconds: 43200
       )
       @main.assume_role
     end

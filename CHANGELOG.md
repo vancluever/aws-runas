@@ -14,6 +14,29 @@ role. For more details, see [GetSesionToken][get-session-token] and
 [get-session-token]: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
 [assume-role]: https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html
 
+Thanks to the work done in
+[#16](https://github.com/vancluever/aws-runas/pull/16) for this!
+
+### Zsh `PROMPT` Support
+
+Some issues were discovered where the zsh prompt support was not functioning
+correctly when using shell functions. Colors were not rendering properly as
+well. Thanks to the work in
+[#14](https://github.com/vancluever/aws-runas/pull/14) for the fix on this!
+
+### Better Session IDs
+
+`aws-runas` will now expose the IAM user's identity information (account ID/user
+name) and enter it in the session ID, when available. The new format is
+`aws-runas-session_ACCTID_USERNAME_TIMESTAMP` when the user has access to
+[`GetCallerIdentity`][get-caller-identity], and the old
+`aws-runas-session_TIMESTAMP` format when they do not.
+
+Thanks to the work done in
+[#11](https://github.com/vancluever/aws-runas/pull/11) for this!
+
+[get-caller-identity]: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html
+
 ## v0.5.0
 
 ### Zsh Support

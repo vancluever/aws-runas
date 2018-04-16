@@ -1,6 +1,18 @@
 ## v0.6.0
 
-Added support for maximum 12 hour duration session credentials
+### Session Duration Support
+
+This update brings the `--duration` flag, which allows you to control the
+session duration for both session tokens and assumed roles. Note that the
+maximum depends on what kind of user you are using (IAM versus root account),
+whether or not you are assuming a role or not, and the maximum duration set on
+any role that you are assuming. `aws-runas` may silently truncate the maximum if
+you request it too high, although your session will be rejected when assuming a
+role. For more details, see [GetSesionToken][get-session-token] and
+[AssumeRole][assume-role] for more details.
+
+[get-session-token]: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
+[assume-role]: https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html
 
 ## v0.5.0
 

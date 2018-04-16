@@ -10,14 +10,21 @@ aws_session_expired() {
   return 1
 }
 
-# aws_session_status_color returns an ANSI color number for the specific status
+# aws_session_status_color returns either an ANSI color number (for bash)
+# or a human readable color name (for zsh) for the specific status
 # of the session. Note that if session_expired is not correctly functioning,
 # this will always be yellow. Red is shown when it's verified that the session
 # has expired.
 aws_session_status_color() {
   if aws_session_expired; then
-    echo "31"
+    if [[ "$1" == zsh ]]; then
+      echo "red"
+    fi
+      echo "31"
   else
-    echo "33"
+    if [[ "$1" == zsh ]]; then
+      echo "yellow"
+    fi
+      echo "33"
   fi
 }

@@ -11,10 +11,10 @@ ZSHRC_FILE_CONTENTS = <<EOS.freeze
 bazqux
 EOS
 
-BASHRC_EXPECTED_PROMPT   = "PS1=\"\\[\\e[\\$(aws_session_status_color)m\\](AWS:rspec)\\[\\e[0m\\] $PS1\"\n".freeze
-ZSHRC_EXPECTED_PROMPT    = "PROMPT=$'%{\\e[\\%}$(aws_session_status_color)m(AWS:rspec)%{\\e[0m%} $OLDPROMPT'\n".freeze
+BASHRC_EXPECTED_PROMPT   = "PS1=\"\\[\\e[\\$(aws_session_status_color \"bash\")m\\](AWS:rspec)\\[\\e[0m\\] $PS1\"\n".freeze
+ZSHRC_EXPECTED_PROMPT    = "PROMPT=\"%F{$(aws_session_status_color \"zsh\")}(AWS:rspec)%f $OLDPROMPT\"\n".freeze
 ZSHRC_EXPECTED_SETSUBST  = "setopt PROMPT_SUBST\n".freeze
-ZSHRC_EXPECTED_OLDPROMPT = "export OLDPROMPT=\"${PROMPT}\"\n".freeze
+ZSHRC_EXPECTED_OLDPROMPT = "OLDPROMPT=\"$PROMPT\"\n".freeze
 ZSH_MOCK_TMPDIR          = "#{Dir.tmpdir}/aws_runas_zsh_rspec".freeze
 
 EXPECTED_ENV = {

@@ -54,9 +54,9 @@ module AwsRunAs
       if @no_role
         raise 'No mfa_serial in selected profile, session will be useless' if mfa_serial.nil?
         @session = sts_client.get_session_token(
-          duration_seconds: 3600,
           serial_number: mfa_serial,
-          token_code: @mfa_code
+          token_code: @mfa_code,
+          duration_seconds: @duration_seconds
         )
       else
         @session = Aws::AssumeRoleCredentials.new(

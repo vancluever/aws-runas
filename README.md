@@ -100,11 +100,12 @@ If COMMAND is omitted, the default shell ($SHELL, /bin/sh, or cmd.exe,
 depending on your system) will launch.
 
 [options] are:
-  -n, --no-role        Get a session token only, do not assume a role
-  -s, --skip-prompt    Do not launch interactive sessions with the fancy prompt
-  -p, --path=<s>       Path to the AWS config file
-  -r, --profile=<s>    The AWS profile to load (default: default)
-  -h, --help           Show this message
+  -n, --no-role         Get a session token only, do not assume a role
+  -s, --skip-prompt     Do not launch interactive sessions with the fancy prompt
+  -p, --path=<s>        Path to the AWS config file
+  -r, --profile=<s>     The AWS profile to load (default: default)
+  -d, --duration=<i>    The duration in seconds for temporary credentials (default: 3600)
+  -h, --help            Show this message
 ```
 
 `--path` is optional, and if omitted will default to the files in the

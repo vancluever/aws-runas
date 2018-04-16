@@ -16,22 +16,6 @@ require 'spec_helper'
 require 'tmpdir'
 
 describe AwsRunAs::Utils do
-  describe '::get_user' do
-    it 'returns a string' do
-      expect(AwsRunAs::Utils.get_user).is_a? String
-    end
-
-    it 'is not null' do
-      expect(AwsRunAs::Utils.get_user).not_to be_empty
-    end
-
-    it 'returns user if running on windows' do
-      ENV['OS'] = 'Windows_NT'
-      ENV['USERNAME'] = "testtricker"
-      expect(AwsRunAs::Utils.get_user).to eq("testtricker")
-    end
-  end
-
   describe '::shell_profiles_dir' do
     it 'returns an existent path' do
       expect(File.directory?(AwsRunAs::Utils.shell_profiles_dir)).to be true

@@ -35,6 +35,33 @@ describe AwsRunAs::Main do
     end
   end
 
+  describe '#session_id' do
+    it 'returns a properly formatted AWS session name for assuming roles' do
+      allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity) do |obj|
+        obj.stub_data(
+          :get_caller_identity,
+          {
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/Alice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          }
+        )
+      end
+      expect(@main.session_id).to eq("aws-runas-session_123456789012_Alice_#{Time.now.to_i}")
+    end
+
+    it 'returns a basic session ID when caller has no access to get_caller_identity' do
+      allow_any_instance_of(AwsRunAs::Main).to receive(:sts_client).and_return(
+        Aws::STS::Client.new(
+          stub_responses: {
+            get_caller_identity: 'AccessDeniedException'
+          }
+        )
+      )
+      expect(@main.session_id).to eq("aws-runas-session_#{Time.now.to_i}")
+    end
+  end
+
   describe '#assume_role' do
     it 'calls out to Aws::AssumeRoleCredentials.new' do
       expect(Aws::AssumeRoleCredentials).to receive(:new).and_call_original
@@ -80,6 +107,16 @@ describe AwsRunAs::Main do
         allow(File).to receive(:exist?).with(AWS_DEFAULT_CREDENTIALS_PATH).and_return false
         allow(File).to receive(:read).with(AWS_DEFAULT_CFG_PATH).and_return File.read(MOCK_AWS_NO_SOURCE_PATH)
         allow(IniFile).to receive(:load).with(AWS_DEFAULT_CFG_PATH).and_return IniFile.load(MOCK_AWS_NO_SOURCE_PATH)
+        allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity) do |obj|
+          obj.stub_data(
+            :get_caller_identity,
+            {
+              account: '123456789012',
+              arn: 'arn:aws:iam::123456789012:user/Alice',
+              user_id: 'AKIAI44QH8DHBEXAMPLE'
+            }
+          )
+        end
         allow(Aws::AssumeRoleCredentials).to receive(:new).and_return(
           Aws::AssumeRoleCredentials.new(
             role_arn: 'roleARN',
@@ -159,6 +196,9 @@ describe AwsRunAs::Main do
       end
       it 'has AWS_DEFAULT_REGION set in env' do
         expect(env['AWS_DEFAULT_REGION']).to eq('us-west-1')
+      end
+      it 'has AWS_ROLE_SESSION_NAME set in env' do
+        expect(env['AWS_ROLE_SESSION_NAME']).to eq("aws-runas-session_accountType_arnType_#{Time.now.to_i}")
       end
     end
 

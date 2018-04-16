@@ -28,15 +28,6 @@ module AwsRunAs
       File.expand_path('../../../shell_profiles', __FILE__)
     end
 
-    def get_user
-      if ENV['OS'].to_s.include? "Windows"
-        username = ENV['USERNAME'].to_s
-      else
-        username = ENV['USER'].to_s
-      end
-      username
-    end
-
     # Run an interactive bash session with a special streamed RC file.  The RC
     # merges a local .bashrc if it exists, with a prompt that includes the
     # computed message from handoff_to_shell.

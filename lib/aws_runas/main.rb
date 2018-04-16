@@ -47,8 +47,15 @@ module AwsRunAs
       )
     end
 
+    def session_id
+      caller_identity = sts_client.get_caller_identity
+      "aws-runas-session_#{caller_identity.account}_#{caller_identity.arn.split('/')[-1]}_#{Time.now.to_i}"
+    rescue Aws::STS::Errors::AccessDeniedException
+      "aws-runas-session_#{Time.now.to_i}"
+    end
+
     def assume_role
-      session_id = "aws-runas-session_#{Time.now.to_i}"
+      @role_session_name = session_id
       role_arn = @cfg.load_config_value(key: 'role_arn')
       mfa_serial = @cfg.load_config_value(key: 'mfa_serial') unless ENV.include?('AWS_SESSION_TOKEN')
       if @no_role
@@ -64,7 +71,7 @@ module AwsRunAs
           role_arn: role_arn,
           serial_number: mfa_serial,
           token_code: @mfa_code,
-          role_session_name: session_id,
+          role_session_name: @role_session_name,
           duration_seconds: @duration_seconds
         )
       end
@@ -91,6 +98,7 @@ module AwsRunAs
         env['AWS_SESSION_EXPIRATION'] = @session.expiration.to_s
         env['AWS_SESSION_EXPIRATION_UNIX'] = DateTime.parse(@session.expiration.to_s).strftime('%s')
         env['AWS_RUNAS_ASSUMED_ROLE_ARN'] = @cfg.load_config_value(key: 'role_arn')
+        env['AWS_ROLE_SESSION_NAME'] = @role_session_name
       end
       env
     end

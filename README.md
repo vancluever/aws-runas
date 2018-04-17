@@ -30,14 +30,24 @@ thing, but there are some differentiators in this gem:
    with `--no-role`. Subsequent uses of `aws-runas` after this will not prompt
    you for MFA (useful for tooling that needs to assume multiple roles off the
    same session token).
+ * The session duration can be controlled with the `--duration` parameter. This
+   allows you to change the session expiration if you require a period longer or
+   shorter than an hour. The actual ranges you can choose with this setting
+   depend on the account you are using and any configured maximums set on your
+   role. More details can be found in the API documentation for
+   [GetSesionToken][get-session-token] and [AssumeRole][assume-role].
+
+[get-session-token]: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
+[assume-role]: https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html
 
 How it Works
 -------------
 
 Roles are assumed, or session tokens are simply acquired (if `--no-role` is
-specified) via the `AssumeRole` or the `GetSessionToken` AWS STS API calls.
-After this, your command or shell is launched with the standard AWS credential
-chain environment variables set:
+specified) via the [`AssumeRole`][assume-role] or the
+[`GetSessionToken`][get-session-token] AWS STS API calls.  After this, your
+command or shell is launched with the standard AWS credential chain environment
+variables set:
 
  * `AWS_ACCESS_KEY_ID`
  * `AWS_SECRET_ACCESS_KEY`
@@ -45,17 +55,24 @@ chain environment variables set:
 
 ### Additional Variables
 
-In addition to the above, two toolchain-local environment variables are set to
-help you determine what credentials are in use locally:
+In addition to the above, the following environment variables are set to help
+you gather additional information about the role and environment you are running
+under:
 
  * `AWS_RUNAS_ASSUMED_ROLE_ARN` - set when a role is assumed (not set if
    `--no-role` is used)
- * `AWS_RUNAS_PROFILE` - set with the profile used when `aws-runas` was run
+ * `AWS_ROLE_SESSION_NAME` - contains the assumed role's session name (not set
+   if `--no-role` is used). The format is
+   `aws-runas-session_ACCTID_USERNAME_TIMESTAMP` when the user has access to
+   [`GetCallerIdentity`][get-caller-identity], and `aws-runas-session_TIMESTAMP`
+   format when they do not.
+ * `AWS_RUNAS_PROFILE` - set with the profile used when `aws-runas` was run.
  * `AWS_REGION` and `AWS_DEFAULT_REGION` - set with the region name defined in
-   the profile being used
- * `AWS_SESSION_EXPIRATION` - set with the expiry timestamp in UTC
- * `AWS_SESSION_EXPIRATION_UNIX` - set with the expiry timestamp in Unix time,
-   useful for scripting
+   the profile being used.
+ * `AWS_SESSION_EXPIRATION` - set with the expiry timestamp in UTC.
+ * `AWS_SESSION_EXPIRATION_UNIX` - set with the expiry timestamp in Unix time.
+
+[get-caller-identity]: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html
 
 ### Fancy Bash/Zsh Prompt
 
@@ -143,7 +160,7 @@ License
 --------
 
 ```
-Copyright 2015-2017 Chris Marchesi
+Copyright 2015-2018 Chris Marchesi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

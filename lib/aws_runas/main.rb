@@ -47,9 +47,18 @@ module AwsRunAs
       )
     end
 
+    # Returns a session name based on the following criteria:
+    #  * If the user ARN matches that of an assumed role, return the access key ID
+    #  * Otherwise, return the account ID and the user (last part of the ARN).
+    def user_or_access_key_id(caller_identity)
+      return caller_identity.user_id.split(':')[0] if caller_identity.arn =~ %r{^arn:aws:sts::\d+:assumed-role\/}
+      "#{caller_identity.account}_#{caller_identity.arn.split('/')[-1]}"
+    end
+
     def session_id
       caller_identity = sts_client.get_caller_identity
-      "aws-runas-session_#{caller_identity.account}_#{caller_identity.arn.split('/')[-1]}_#{Time.now.to_i}"
+      id = "aws-runas-session_#{user_or_access_key_id(caller_identity)}_#{Time.now.to_i}"
+      id.length > 64 ? "aws-runas-session_#{Time.now.to_i}" : id
     rescue Aws::STS::Errors::AccessDeniedException
       "aws-runas-session_#{Time.now.to_i}"
     end

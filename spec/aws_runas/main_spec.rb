@@ -35,6 +35,32 @@ describe AwsRunAs::Main do
     end
   end
 
+  describe '#user_or_access_key_id' do
+    it 'returns accountID_username when caller identity is not an assumed role' do
+      expect(
+        @main.user_or_access_key_id(
+          double(
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/Alice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          )
+        )
+      ).to eq('123456789012_Alice')
+    end
+
+    it 'returns the access key ID when caller identity is an assumed role' do
+      expect(
+        @main.user_or_access_key_id(
+          double(
+            account: '123456789012',
+            arn: 'arn:aws:sts::123456789012:assumed-role/AliceAdmins/AliceSession',
+            user_id: 'AKIAI44QH8DHBEXAMPLE:AliceSession'
+          )
+        )
+      ).to eq('AKIAI44QH8DHBEXAMPLE')
+    end
+  end
+
   describe '#session_id' do
     it 'returns a properly formatted AWS session name for assuming roles' do
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity) do |obj|
@@ -50,6 +76,20 @@ describe AwsRunAs::Main do
       expect(@main.session_id).to eq("aws-runas-session_123456789012_Alice_#{Time.now.to_i}")
     end
 
+    it 'returns a session name formatted on access key ID when user is assumed role' do
+      allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity) do |obj|
+        obj.stub_data(
+          :get_caller_identity,
+          {
+            account: '123456789012',
+            arn: 'arn:aws:sts::123456789012:assumed-role/AliceAdmins/AliceSession',
+            user_id: 'AKIAI44QH8DHBEXAMPLE:AliceSession'
+          }
+        )
+      end
+      expect(@main.session_id).to eq("aws-runas-session_AKIAI44QH8DHBEXAMPLE_#{Time.now.to_i}")
+    end
+
     it 'returns a basic session ID when caller has no access to get_caller_identity' do
       allow_any_instance_of(AwsRunAs::Main).to receive(:sts_client).and_return(
         Aws::STS::Client.new(
@@ -58,6 +98,20 @@ describe AwsRunAs::Main do
           }
         )
       )
+      expect(@main.session_id).to eq("aws-runas-session_#{Time.now.to_i}")
+    end
+
+    it 'returns a basic session ID if the resultant session would be longer than 64 characters' do
+      allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity) do |obj|
+        obj.stub_data(
+          :get_caller_identity,
+          {
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/AliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAlice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          }
+        )
+      end
       expect(@main.session_id).to eq("aws-runas-session_#{Time.now.to_i}")
     end
   end

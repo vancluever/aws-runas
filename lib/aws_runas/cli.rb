@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'trollop'
+require 'optimist'
 require 'aws_runas/config'
 require 'aws_runas/main'
 require 'io/console'
@@ -23,7 +23,7 @@ module AwsRunAs
 
     # loads the command-line options.
     def load_opts(args: ARGV)
-      Trollop.options(args) do
+      Optimist.options(args) do
         banner <<-EOS.gsub(/^ {10}/, '')
           aws-runas: Run commands under AWS IAM roles
 

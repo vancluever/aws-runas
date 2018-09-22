@@ -1,3 +1,18 @@
+## v0.7.0
+
+* Version now can be printed by supplying --version.
+* The gem now uses [Optimist][ref-optimist], and as such should no longer give
+  deprecation warnings for its previous name.
+  [#21](https://github.com/vancluever/aws-runas/issues/21)
+* Corrected an issue with session ID generation when the calculated new
+  long-from session ID exceeded 64 characters. In this situation, the session
+  name will fall back to the default generic timestamped ID.
+  [#17](https://github.com/vancluever/aws-runas/issues/17)
+* When calling from an assumed role, the session ID now takes on the name of the
+  access key ID instead of the account ID and user name. This should help
+  prevent length or session name nesting issues, while still making the session
+  name useful. [#17](https://github.com/vancluever/aws-runas/issues/17)
+
 ## v0.6.0
 
 ### Session Duration Support

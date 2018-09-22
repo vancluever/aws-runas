@@ -15,6 +15,7 @@
 require 'optimist'
 require 'aws_runas/config'
 require 'aws_runas/main'
+require 'aws_runas/version'
 require 'io/console'
 
 module AwsRunAs
@@ -24,6 +25,7 @@ module AwsRunAs
     # loads the command-line options.
     def load_opts(args: ARGV)
       Optimist.options(args) do
+        version AwsRunAs::VERSION
         banner <<-EOS.gsub(/^ {10}/, '')
           aws-runas: Run commands under AWS IAM roles
 

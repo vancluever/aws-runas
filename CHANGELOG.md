@@ -6,12 +6,17 @@
   [#21](https://github.com/vancluever/aws-runas/issues/21)
 * Corrected an issue with session ID generation when the calculated new
   long-from session ID exceeded 64 characters. In this situation, the session
-  name will fall back to the default generic timestamped ID.
+  name will fall back to the classic generic timestamped ID.
   [#17](https://github.com/vancluever/aws-runas/issues/17)
 * When calling from an assumed role, the session ID now takes on the name of the
   access key ID instead of the account ID and user name. This should help
   prevent length or session name nesting issues, while still making the session
   name useful. [#17](https://github.com/vancluever/aws-runas/issues/17)
+* The access key ID-based session ID will also be used if the account and
+  user-based session ID would exceed 64 characters under normal circumstances,
+  ensuring that the classic ID is strictly a fallback in major edge cases where
+  either is unusable or if the user has no access to GetCallerIdentity.
+  [#17](https://github.com/vancluever/aws-runas/issues/17)
 
 [ref-optimist]: https://github.com/ManageIQ/optimist
 

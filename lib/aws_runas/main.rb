@@ -25,7 +25,9 @@ module AwsRunAs
   # Main program logic for aws-runas - sets up sts asession and assumed role,
   # and hands off environment to called process.
   class Main
-    # Instantiate the object and set up the path, profile, and populate MFA
+    # Instantiate the object and set up the path, profile, and populate MFA.
+    #
+    # Session timestamp is also registered here to prevent races.
     def initialize(path: nil, profile: default, mfa_code: nil, no_role: nil, duration_seconds: 3600)
       cfg_path = if path
                    path
@@ -36,6 +38,7 @@ module AwsRunAs
       @mfa_code = mfa_code
       @no_role = no_role
       @duration_seconds = duration_seconds
+      @session_timestamp = Time.now.to_i
     end
 
     def sts_client
@@ -47,20 +50,37 @@ module AwsRunAs
       )
     end
 
+    def render_classic_session
+      "aws-runas-session_#{@session_timestamp}"
+    end
+
+    def render_account_user_session(caller_identity)
+      "aws-runas-session_#{caller_identity.account}_#{caller_identity.arn.split('/')[-1]}_#{@session_timestamp}"
+    end
+
+    def render_access_key_session(caller_identity)
+      "aws-runas-session_#{caller_identity.user_id.split(':')[0]}_#{@session_timestamp}"
+    end
+
+    def use_access_key_id?(caller_identity)
+      caller_identity.arn =~ %r{^arn:aws:sts::\d+:assumed-role\/} ||
+        render_account_user_session(caller_identity).length > 64
+    end
+
     # Returns a session name based on the following criteria:
     #  * If the user ARN matches that of an assumed role, return the access key ID
     #  * Otherwise, return the account ID and the user (last part of the ARN).
-    def user_or_access_key_id(caller_identity)
-      return caller_identity.user_id.split(':')[0] if caller_identity.arn =~ %r{^arn:aws:sts::\d+:assumed-role\/}
-      "#{caller_identity.account}_#{caller_identity.arn.split('/')[-1]}"
+    def render_modern_session(caller_identity)
+      return render_access_key_session(caller_identity) if use_access_key_id?(caller_identity)
+      render_account_user_session(caller_identity)
     end
 
     def session_id
       caller_identity = sts_client.get_caller_identity
-      id = "aws-runas-session_#{user_or_access_key_id(caller_identity)}_#{Time.now.to_i}"
-      id.length > 64 ? "aws-runas-session_#{Time.now.to_i}" : id
+      return render_classic_session if render_modern_session(caller_identity).length > 64
+      render_modern_session(caller_identity)
     rescue Aws::STS::Errors::AccessDeniedException
-      "aws-runas-session_#{Time.now.to_i}"
+      render_classic_session
     end
 
     def assume_role

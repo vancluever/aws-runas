@@ -35,29 +35,101 @@ describe AwsRunAs::Main do
     end
   end
 
-  describe '#user_or_access_key_id' do
-    it 'returns accountID_username when caller identity is not an assumed role' do
+  describe '#render_classic_session' do
+    it 'renders an account ID and user based session' do
+      expect(@main.render_classic_session).to eq("aws-runas-session_#{@main.instance_variable_get(:@session_timestamp)}")
+    end
+  end
+
+  describe '#render_account_user_session' do
+    it 'renders an account ID and user based session' do
       expect(
-        @main.user_or_access_key_id(
+        @main.render_account_user_session(
           double(
             account: '123456789012',
             arn: 'arn:aws:iam::123456789012:user/Alice',
             user_id: 'AKIAI44QH8DHBEXAMPLE'
           )
         )
-      ).to eq('123456789012_Alice')
+      ).to eq("aws-runas-session_123456789012_Alice_#{@main.instance_variable_get(:@session_timestamp)}")
+    end
+  end
+
+  describe '#render_access_key_session' do
+    it 'renders an access key ID-based session' do
+      expect(
+        @main.render_access_key_session(
+          double(
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/Alice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          )
+        )
+      ).to eq("aws-runas-session_AKIAI44QH8DHBEXAMPLE_#{@main.instance_variable_get(:@session_timestamp)}")
+    end
+  end
+
+  describe '#use_access_key_id?' do
+    it 'is falsey when an account ID and user based session is within 64 characters' do
+      expect(
+        @main.use_access_key_id?(
+          double(
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/Alice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          )
+        )
+      ).to be_falsey
     end
 
-    it 'returns the access key ID when caller identity is an assumed role' do
+    it 'is truthy when an account ID and user based session is more than 64 characters' do
       expect(
-        @main.user_or_access_key_id(
+        @main.use_access_key_id?(
+          double(
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/AliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAlice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          )
+        )
+      ).to be_truthy
+    end
+  end
+
+  describe '#render_modern_session' do
+    it 'returns account ID and user based session when caller identity is not an assumed role' do
+      expect(
+        @main.render_modern_session(
+          double(
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/Alice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          )
+        )
+      ).to eq("aws-runas-session_123456789012_Alice_#{@main.instance_variable_get(:@session_timestamp)}")
+    end
+
+    it 'returns access key ID based session when caller identity is an assumed role' do
+      expect(
+        @main.render_modern_session(
           double(
             account: '123456789012',
             arn: 'arn:aws:sts::123456789012:assumed-role/AliceAdmins/AliceSession',
             user_id: 'AKIAI44QH8DHBEXAMPLE:AliceSession'
           )
         )
-      ).to eq('AKIAI44QH8DHBEXAMPLE')
+      ).to eq("aws-runas-session_AKIAI44QH8DHBEXAMPLE_#{@main.instance_variable_get(:@session_timestamp)}")
+    end
+
+    it 'returns access key ID based session when account ID and user session is over 64 characters' do
+      expect(
+        @main.render_modern_session(
+          double(
+            account: '123456789012',
+            arn: 'arn:aws:iam::123456789012:user/AliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAlice',
+            user_id: 'AKIAI44QH8DHBEXAMPLE'
+          )
+        )
+      ).to eq("aws-runas-session_AKIAI44QH8DHBEXAMPLE_#{@main.instance_variable_get(:@session_timestamp)}")
     end
   end
 
@@ -73,7 +145,7 @@ describe AwsRunAs::Main do
           }
         )
       end
-      expect(@main.session_id).to eq("aws-runas-session_123456789012_Alice_#{Time.now.to_i}")
+      expect(@main.session_id).to eq("aws-runas-session_123456789012_Alice_#{@main.instance_variable_get(:@session_timestamp)}")
     end
 
     it 'returns a session name formatted on access key ID when user is assumed role' do
@@ -87,7 +159,7 @@ describe AwsRunAs::Main do
           }
         )
       end
-      expect(@main.session_id).to eq("aws-runas-session_AKIAI44QH8DHBEXAMPLE_#{Time.now.to_i}")
+      expect(@main.session_id).to eq("aws-runas-session_AKIAI44QH8DHBEXAMPLE_#{@main.instance_variable_get(:@session_timestamp)}")
     end
 
     it 'returns a basic session ID when caller has no access to get_caller_identity' do
@@ -98,7 +170,7 @@ describe AwsRunAs::Main do
           }
         )
       )
-      expect(@main.session_id).to eq("aws-runas-session_#{Time.now.to_i}")
+      expect(@main.session_id).to eq("aws-runas-session_#{@main.instance_variable_get(:@session_timestamp)}")
     end
 
     it 'returns a basic session ID if the resultant session would be longer than 64 characters' do
@@ -108,11 +180,11 @@ describe AwsRunAs::Main do
           {
             account: '123456789012',
             arn: 'arn:aws:iam::123456789012:user/AliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAliceAlice',
-            user_id: 'AKIAI44QH8DHBEXAMPLE'
+            user_id: 'AKIAI44QH8DHBEXAMPLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
           }
         )
       end
-      expect(@main.session_id).to eq("aws-runas-session_#{Time.now.to_i}")
+      expect(@main.session_id).to eq("aws-runas-session_#{@main.instance_variable_get(:@session_timestamp)}")
     end
   end
 

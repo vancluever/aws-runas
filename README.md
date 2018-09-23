@@ -123,6 +123,7 @@ depending on your system) will launch.
   -p, --path=<s>        Path to the AWS config file
   -r, --profile=<s>     The AWS profile to load (default: default)
   -d, --duration=<i>    The duration in seconds for temporary credentials (default: 3600)
+  -v, --version         Print version and exit
   -h, --help            Show this message
 ```
 

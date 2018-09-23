@@ -13,6 +13,8 @@
   prevent length or session name nesting issues, while still making the session
   name useful. [#17](https://github.com/vancluever/aws-runas/issues/17)
 
+[ref-optimist]: https://github.com/ManageIQ/optimist
+
 ## v0.6.0
 
 ### Session Duration Support

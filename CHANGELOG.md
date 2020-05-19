@@ -1,3 +1,8 @@
+## v0.7.1
+
+* Very minor update to address development dependency security issue
+  (CVE-2020-8130 for Rake).
+
 ## v0.7.0
 
 * Version now can be printed by supplying --version.

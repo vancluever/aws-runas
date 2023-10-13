@@ -1,9 +1,16 @@
-[![Build Status](https://img.shields.io/travis/vancluever/aws-runas.svg)](https://travis-ci.org/vancluever/aws-runas)
-[![Gem Version](https://img.shields.io/gem/v/aws_runas.svg)](https://rubygems.org/gems/aws_runas)
-[![Codecov](https://img.shields.io/codecov/c/github/vancluever/aws-runas.svg)](https://codecov.io/github/vancluever/aws-runas)
+# No longer maintained
+
+I haven't maintained this gem in quite some time and don't use it anymore
+myself. If you're still using this gem, I'd recommend using the much more
+featured Go-based [aws-runas](https://github.com/mmmorris1975/aws-runas)
+instead.
 
 aws-runas
 ==========
+
+[![Build Status](https://img.shields.io/travis/vancluever/aws-runas.svg)](https://travis-ci.org/vancluever/aws-runas)
+[![Gem Version](https://img.shields.io/gem/v/aws_runas.svg)](https://rubygems.org/gems/aws_runas)
+[![Codecov](https://img.shields.io/codecov/c/github/vancluever/aws-runas.svg)](https://codecov.io/github/vancluever/aws-runas)
 
 [![asciicast](https://asciinema.org/a/107502.png)](https://asciinema.org/a/107502)
 
